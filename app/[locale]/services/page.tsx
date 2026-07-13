@@ -6,6 +6,7 @@ import PageHeader from '@/components/PageHeader';
 import Reveal from '@/components/Reveal';
 import ImageReveal from '@/components/ImageReveal';
 import Magnetic from '@/components/Magnetic';
+import { buildMetadata } from '@/lib/seo';
 
 const SERVICES = [
     { key: 'portes', image: '/images/placeholders/porte-2.jpg' },
@@ -20,7 +21,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'meta' });
-    return { title: t('titleServices'), description: t('description') };
+    return buildMetadata({
+        locale,
+        path: '/services',
+        title: t('titleServices'),
+        description: t('descriptionServices')
+    });
 }
 
 export default async function ServicesPage({

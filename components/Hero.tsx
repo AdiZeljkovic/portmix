@@ -81,7 +81,7 @@ export default function Hero() {
             <motion.div style={{ y: bgY }} className="absolute inset-0 -z-10">
                 <div className={`absolute inset-0 ${reduce ? '' : 'kenburns'}`}>
                     <Image
-                        src="/images/placeholders/hero.jpg"
+                        src="/images/placeholders/hero.png"
                         alt=""
                         fill
                         priority

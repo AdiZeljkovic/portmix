@@ -8,17 +8,16 @@ import TiltCard from '@/components/TiltCard';
 import AnimatedText from '@/components/AnimatedText';
 import Counter from '@/components/Counter';
 import Marquee from '@/components/Marquee';
+import ClientMarquee from '@/components/ClientMarquee';
 import Magnetic from '@/components/Magnetic';
-import HorizontalGallery from '@/components/HorizontalGallery';
+import ProjectsGrid from '@/components/ProjectsGrid';
+import { CURRENT_PROJECTS } from '@/lib/projects';
 
 const SERVICES = [
     { key: 'Portes', image: '/images/placeholders/porte-1.jpg' },
     { key: 'Armoires', image: '/images/placeholders/armoire-1.jpg' },
     { key: 'Dressings', image: '/images/placeholders/dressing-1.jpg' }
 ] as const;
-
-// TODO: replace with real projects once the client's photos arrive (WhatsApp)
-const FEATURED = [1, 3, 2, 4, 6, 5] as const;
 
 export default async function HomePage({
     params
@@ -28,7 +27,6 @@ export default async function HomePage({
     const { locale } = await params;
     setRequestLocale(locale);
     const t = await getTranslations('home');
-    const tr = await getTranslations('realisations');
 
     return (
         <>
@@ -135,18 +133,38 @@ export default async function HomePage({
                 </div>
             </section>
 
-            {/* Featured projects — pinned horizontal gallery */}
-            <HorizontalGallery
-                kicker={t('featuredKicker')}
-                title={t('featuredTitle')}
-                cta={t('featuredCta')}
-                viewLabel={tr('viewLabel')}
-                projects={FEATURED.map((n) => ({
-                    title: tr(`project${n}`),
-                    cat: tr(`project${n}Cat`),
-                    image: `/images/placeholders/projet-${n}.jpg`
-                }))}
-            />
+            {/* Trusted by */}
+            <section className="py-24 lg:py-28">
+                <Reveal className="mx-auto max-w-2xl px-5 text-center lg:px-8">
+                    <p className="kicker">{t('trustedKicker')}</p>
+                    <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+                        <AnimatedText text={t('trustedTitle')} />
+                    </h2>
+                </Reveal>
+            </section>
+            <ClientMarquee />
+
+            {/* Featured projects */}
+            <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
+                <Reveal className="flex flex-wrap items-end justify-between gap-6">
+                    <div>
+                        <p className="kicker">{t('featuredKicker')}</p>
+                        <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+                            <AnimatedText text={t('featuredTitle')} />
+                        </h2>
+                    </div>
+                    <Link
+                        href="/realisations"
+                        className="group inline-flex items-center gap-2 font-semibold text-brand"
+                    >
+                        {t('featuredCta')}
+                        <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                </Reveal>
+                <div className="mt-14">
+                    <ProjectsGrid projects={CURRENT_PROJECTS.slice(0, 6)} />
+                </div>
+            </section>
 
             {/* Showroom band */}
             <section className="relative overflow-hidden py-28 lg:py-40">

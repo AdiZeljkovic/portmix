@@ -5,17 +5,9 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import PageHeader from '@/components/PageHeader';
 import Reveal from '@/components/Reveal';
-import ParallaxImage from '@/components/ParallaxImage';
-
-// TODO: replace with the client's real projects & photos when they arrive
-const PROJECTS = [
-    { n: 1, image: '/images/placeholders/projet-1.jpg' },
-    { n: 2, image: '/images/placeholders/projet-2.jpg' },
-    { n: 3, image: '/images/placeholders/projet-3.jpg' },
-    { n: 4, image: '/images/placeholders/projet-4.jpg' },
-    { n: 5, image: '/images/placeholders/projet-5.jpg' },
-    { n: 6, image: '/images/placeholders/projet-6.jpg' }
-] as const;
+import ProjectsGrid from '@/components/ProjectsGrid';
+import { buildMetadata } from '@/lib/seo';
+import { CURRENT_PROJECTS, COMPLETED_PROJECTS } from '@/lib/projects';
 
 export async function generateMetadata({
     params
@@ -24,7 +16,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'meta' });
-    return { title: t('titleRealisations'), description: t('description') };
+    return buildMetadata({
+        locale,
+        path: '/realisations',
+        title: t('titleRealisations'),
+        description: t('descriptionRealisations')
+    });
 }
 
 export default async function RealisationsPage({
@@ -40,30 +37,39 @@ export default async function RealisationsPage({
         <>
             <PageHeader kicker={t('kicker')} title={t('title')} intro={t('intro')} />
 
-            {/* Project grid */}
+            {/* Ongoing projects */}
             <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {PROJECTS.map((p, i) => (
-                        <Reveal key={p.n} delay={(i % 3) * 0.1}>
-                            <div className="group relative aspect-[3/4] overflow-hidden rounded-2xl">
-                                <ParallaxImage
-                                    src={p.image}
-                                    alt={t(`project${p.n}`)}
-                                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                                    className="absolute inset-0"
-                                />
-                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
-                                <div className="absolute inset-x-0 bottom-0 p-6">
-                                    <p className="text-xs font-semibold uppercase tracking-widest text-brand">
-                                        {t(`project${p.n}Cat`)}
-                                    </p>
-                                    <h3 className="mt-2 font-display text-xl font-bold">
-                                        {t(`project${p.n}`)}
-                                    </h3>
-                                </div>
-                            </div>
-                        </Reveal>
-                    ))}
+                <Reveal className="max-w-2xl">
+                    <p className="kicker">{t('sectionCurrentKicker')}</p>
+                    <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+                        {t('sectionCurrentTitle')}
+                    </h2>
+                </Reveal>
+                <div className="mt-14">
+                    <ProjectsGrid
+                        projects={CURRENT_PROJECTS}
+                        initialCount={9}
+                        loadMoreLabel={t('loadMore')}
+                    />
+                </div>
+            </section>
+
+            {/* Completed projects */}
+            <section className="bg-ink-soft py-24 lg:py-32">
+                <div className="mx-auto max-w-7xl px-5 lg:px-8">
+                    <Reveal className="max-w-2xl">
+                        <p className="kicker">{t('sectionCompletedKicker')}</p>
+                        <h2 className="mt-5 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+                            {t('sectionCompletedTitle')}
+                        </h2>
+                    </Reveal>
+                    <div className="mt-14">
+                        <ProjectsGrid
+                            projects={COMPLETED_PROJECTS}
+                            initialCount={9}
+                            loadMoreLabel={t('loadMore')}
+                        />
+                    </div>
                 </div>
             </section>
 

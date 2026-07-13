@@ -10,6 +10,8 @@ import SmoothScroll from '@/components/SmoothScroll';
 import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import ScrollProgress from '@/components/ScrollProgress';
+import StructuredData from '@/components/StructuredData';
+import { buildMetadata } from '@/lib/seo';
 import '../globals.css';
 
 const inter = Inter({
@@ -36,14 +38,7 @@ export async function generateMetadata({
 
     return {
         metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.portmix.ch'),
-        title: t('title'),
-        description: t('description'),
-        openGraph: {
-            title: t('title'),
-            description: t('description'),
-            siteName: 'PortMix SA',
-            type: 'website'
-        }
+        ...buildMetadata({ locale, path: '', title: t('title'), description: t('description') })
     };
 }
 
@@ -59,10 +54,12 @@ export default async function LocaleLayout({
         notFound();
     }
     setRequestLocale(locale);
+    const t = await getTranslations({ locale, namespace: 'meta' });
 
     return (
         <html lang={locale} className={`${inter.variable} ${sora.variable} antialiased`}>
             <body className="min-h-screen flex flex-col bg-ink text-cream">
+                <StructuredData locale={locale} description={t('description')} />
                 <NextIntlClientProvider>
                     <Preloader />
                     <Cursor />

@@ -7,6 +7,7 @@ import TiltCard from '@/components/TiltCard';
 import ImageReveal from '@/components/ImageReveal';
 import AnimatedText from '@/components/AnimatedText';
 import { TEAM } from '@/lib/company';
+import { buildMetadata } from '@/lib/seo';
 
 export async function generateMetadata({
     params
@@ -15,7 +16,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'meta' });
-    return { title: t('titleAbout'), description: t('description') };
+    return buildMetadata({
+        locale,
+        path: '/a-propos',
+        title: t('titleAbout'),
+        description: t('descriptionAbout')
+    });
 }
 
 const VALUE_ICONS = [Award, Ruler, HeartHandshake] as const;
@@ -43,7 +49,7 @@ export default async function AboutPage({
 
             {/* Story */}
             <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
-                <div className="grid items-center gap-12 lg:grid-cols-2">
+                <div className="grid items-start gap-12 lg:grid-cols-2">
                     <Reveal>
                         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
                             <span className="text-brand">{t('storyTitle')}</span>
@@ -52,13 +58,17 @@ export default async function AboutPage({
                             <p>{t('storyP1')}</p>
                             <p>{t('storyP2')}</p>
                             <p>{t('storyP3')}</p>
+                            <p>{t('storyP4')}</p>
                         </div>
+                        <blockquote className="mt-8 border-l-2 border-brand pl-6 font-display text-xl italic leading-snug text-cream/90">
+                            “{t('storyQuote')}”
+                        </blockquote>
                     </Reveal>
                     <ImageReveal
                         src="/images/placeholders/atelier.jpg"
                         alt="PortMix SA"
                         sizes="(min-width: 1024px) 50vw, 100vw"
-                        className="aspect-[4/5] rounded-2xl"
+                        className="aspect-[4/5] rounded-2xl lg:sticky lg:top-28"
                         delay={0.15}
                     />
                 </div>

@@ -8,7 +8,13 @@ export const COMPANY = {
     mapsUrl: 'https://maps.google.com/?q=Route+des+Toches+3,+1026+Echandens',
     mapsEmbed:
         'https://www.google.com/maps?q=Route+des+Toches+3,+1026+Echandens&output=embed',
-    foundedYear: 2017
+    foundedYear: 2017,
+    // Structured fields for schema.org (see components/StructuredData.tsx)
+    street: 'Route des Toches 3',
+    postalCode: '1026',
+    city: 'Echandens',
+    region: 'Vaud',
+    country: 'CH'
 } as const;
 
 // Team members. `roleKey` maps to about.role* translations.

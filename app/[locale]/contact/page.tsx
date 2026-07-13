@@ -5,6 +5,7 @@ import PageHeader from '@/components/PageHeader';
 import Reveal from '@/components/Reveal';
 import ContactForm from '@/components/ContactForm';
 import { COMPANY } from '@/lib/company';
+import { buildMetadata } from '@/lib/seo';
 
 export async function generateMetadata({
     params
@@ -13,7 +14,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'meta' });
-    return { title: t('titleContact'), description: t('description') };
+    return buildMetadata({
+        locale,
+        path: '/contact',
+        title: t('titleContact'),
+        description: t('descriptionContact')
+    });
 }
 
 export default async function ContactPage({

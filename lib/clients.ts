@@ -15,15 +15,15 @@ export type Client = {
 
 export const CLIENTS: Client[] = [
     { name: 'Integra SA', slug: 'integra-sa', logo: null },
-    { name: 'Induni & Cie SA', slug: 'induni-cie-sa', logo: '/images/clients/induni-cie-sa.png' },
+    { name: 'Induni & Cie SA', slug: 'induni-cie-sa', logo: '/images/clients/induni-cie-sa.jpg' },
     { name: 'ALPENDA', slug: 'alpenda', logo: '/images/clients/alpenda.svg' },
     {
         name: 'Implenia Suisse SA',
         slug: 'implenia-suisse-sa',
-        logo: '/images/clients/implenia-suisse-sa.jpg',
+        logo: '/images/clients/implenia-suisse-sa.webp',
         logoOnDark: true
     },
-    { name: 'HRS Real Estate SA', slug: 'hrs-real-estate-sa', logo: '/images/clients/hrs-real-estate-sa.svg', logoOnDark: true },
+    { name: 'HRS Real Estate SA', slug: 'hrs-real-estate-sa', logo: '/images/clients/hrs-real-estate-sa.jpg' },
     {
         name: 'Frame Entreprise Générale',
         slug: 'frame-entreprise-generale',
@@ -35,7 +35,7 @@ export const CLIENTS: Client[] = [
         slug: 'losinger-marazzi-sa',
         logo: '/images/clients/losinger-marazzi-sa.svg'
     },
-    { name: 'Complex Bau AG', slug: 'complex-bau-ag', logo: '/images/clients/complex-bau-ag.svg' },
+    { name: 'Complex Bau AG', slug: 'complex-bau-ag', logo: '/images/clients/complex-bau-ag.jpg' },
     { name: 'ISG Schweiz AG', slug: 'isg-schweiz-ag', logo: '/images/clients/isg-schweiz-ag.jpg' },
     {
         name: 'Bat-Mann Constructeur',
@@ -46,11 +46,11 @@ export const CLIENTS: Client[] = [
     { name: 'Swissroc', slug: 'swissroc', logo: '/images/clients/swissroc.png' },
     { name: 'OCS', slug: 'ocs', logo: null },
     { name: 'Labac Architecture', slug: 'labac-architecture', logo: '/images/clients/labac-architecture.svg' },
-    { name: 'Bernard Nicod', slug: 'bernard-nicod', logo: '/images/clients/bernard-nicod.svg' },
-    { name: 'Villvert SA', slug: 'vilvert', logo: '/images/clients/vilvert.svg' },
+    { name: 'Bernard Nicod', slug: 'bernard-nicod', logo: '/images/clients/bernard-nicod.jpg' },
+    { name: 'Villvert SA', slug: 'vilvert', logo: '/images/clients/vilvert.png' },
     { name: 'Bâtie', slug: 'batie', logo: null },
     { name: 'CSC', slug: 'csc', logo: '/images/clients/csc.png' },
-    { name: 'Salchegger Sàrl', slug: 'salchegger-sarl', logo: '/images/clients/salchegger-sarl.svg' },
+    { name: 'Salchegger Sàrl', slug: 'salchegger-sarl', logo: '/images/clients/salchegger-sarl.png' },
     { name: 'EDIFEA', slug: 'edifea', logo: '/images/clients/edifea.png' },
     {
         name: 'Jaccaud Spicher Architectes Associés',
@@ -70,7 +70,12 @@ export const CLIENTS: Client[] = [
     { name: 'NewMind', slug: 'newmind', logo: '/images/clients/newmind.svg', logoOnDark: true },
     { name: 'Gottaz', slug: 'gottaz', logo: null },
     { name: 'Own Concept Sàrl', slug: 'own-concept-sarl', logo: '/images/clients/own-concept-sarl.png' },
-    { name: 'Atelier Zéro SA', slug: 'atelier-zero-sa', logo: '/images/clients/atelier-zero-sa.svg' },
+    {
+        name: 'Atelier Zéro SA',
+        slug: 'atelier-zero-sa',
+        logo: '/images/clients/atelier-zero-sa.svg',
+        logoOnDark: true
+    },
     { name: 'Bosredon SA', slug: 'bosredon-sa', logo: '/images/clients/bosredon-sa.svg' },
     { name: 'Legato EG', slug: 'legato-eg', logo: '/images/clients/legato-eg.png' },
     { name: 'Louis Vuitton', slug: 'louis-vuitton', logo: '/images/clients/louis-vuitton.svg' }

@@ -73,11 +73,44 @@
         "kicker": "Our Story",
         "title": "A story of family and hard work",
         "storyTitle": "Since 2017",
-        "storyP1": "It all began in 2017 — with no capital, no name anyone knew, but with two hands, a dream, and the conviction that honest work can build something that lasts. Nasuf Biljibani started from practically nothing, carrying with him only his know-how, his perseverance, and the hope that one day, what he built would carry his name — and his family's.",
-        "storyP2": "The early days were not easy. Every project, however small, was carried out with the same care as if it were the most important of his life — because at that moment, it was. Every mistake became a lesson; every success, new strength to keep going. Year after year, the hand grew steadier, the eye sharper, and the name PortMix began to mean something: a promise of quality you could trust.",
-        "storyP3": "What was once a small workshop is today a company with a showroom in Echandens and a branch in Geneva. But behind this growth lies no coincidence — only countless hours of work, sacrifice, and the conviction that it was worth fighting for the highest possible quality, in every door, every wardrobe, every detail others might never even notice.",
-        "storyP4": "Because PortMix, above all, is not just a company — it's a family. A couple who built everything together, and three children who grew up amid the smell of wood and stories of the day's work told around the table. Every effort, every sleepless night, every step forward carried one quiet goal.",
-        "storyQuote": "To leave the children more than an inherited name — a foundation, an opportunity, and the certainty that they could continue what their parents began with love. Not as an obligation, but as part of who they are.",
+        "storyLead": [
+            "Some stories are born with means.",
+            "Others are born with a conviction."
+        ],
+        "storyParagraphs": [
+            "In 2017, PortMix came into being with no capital, no reputation, no certainty other than this: honest work, carried out with rigour, always finds its place.",
+            "Nasuf Biljibani started from almost nothing. He carried with him only his trade, patiently learned, a love of work done well, and the will to build something that reflected who he was — a project that would carry his name, but above all, the values he wanted to pass on to his family.",
+            "The first projects were modest. Yet each was carried out with the same commitment. A door, a wardrobe, a walk-in closet: no piece of work was ever considered more important than another. Because behind every order stands a person placing their trust in you."
+        ],
+        "storyEmphasis1": "Time did its work.",
+        "storyParagraphs2": [
+            "The hand grows steadier. Experience sharpens the eye. Clients return, then tell others about PortMix. What was once a workshop gradually becomes a company recognised for the quality of its work, its reliability, and the care given to the smallest details.",
+            "Today, PortMix has a showroom in Echandens and a branch in Geneva. This growth is no coincidence. It is the result of thousands of hours of work, sometimes difficult choices, often invisible sacrifices, and a standard that has never wavered."
+        ],
+        "storyList": [
+            "Every door is fitted with precision.",
+            "Every wardrobe is built to last.",
+            "Every walk-in closet is designed as a one-of-a-kind piece.",
+            "And every finish receives the same care, even when it will only ever be noticed by the person who made it."
+        ],
+        "storyQualityLine": "Because quality isn't measured only by what can be seen. It is also found in everything that remains invisible.",
+        "familyIntro": "But above all, PortMix is a family story.",
+        "familyParagraphs": [
+            "The story of a couple who built their company together, day after day, with patience, courage and determination.",
+            "The story of three children who grew up to the rhythm of the workshops, the smell of wood, plans spread out on the table, and conversations that, more often than not, were about work as much as the future."
+        ],
+        "familyEmphasis": [
+            "Every effort pursued the same goal: to build far more than a company.",
+            "To build a legacy."
+        ],
+        "familyClosingParagraph": "Not a legacy made of walls or machines, but of values.",
+        "valuesLines": [
+            "Respect for one's word.",
+            "A love of work well done.",
+            "Humility before the craft.",
+            "And the conviction that what is built with the heart can stand the test of time."
+        ],
+        "storyClosing": "The rest belongs to those who will write the next chapter of this story.",
         "valuesKicker": "Our values",
         "valuesTitle": "What guides us",
         "value1Title": "Swiss quality",

@@ -73,11 +73,44 @@
         "kicker": "La nostra storia",
         "title": "Una storia di famiglia e di lavoro",
         "storyTitle": "Dal 2017",
-        "storyP1": "Tutto è iniziato nel 2017 — senza capitale, senza un nome che qualcuno conoscesse, ma con due mani, un sogno e la convinzione che un lavoro onesto possa costruire qualcosa di duraturo. Nasuf Biljibani è partito praticamente da zero, portando con sé solo la propria competenza, la perseveranza e il desiderio che un giorno ciò che avrebbe costruito portasse anche il suo nome e quello della sua famiglia.",
-        "storyP2": "I primi giorni non sono stati facili. Ogni progetto, per quanto piccolo, veniva realizzato con la stessa cura come se fosse il più importante della vita — perché in quel momento lo era davvero. Ogni errore diventava una lezione, ogni successo una nuova forza per andare avanti. Anno dopo anno, la mano è diventata più sicura, l'occhio più preciso, e il nome PortMix ha iniziato a significare qualcosa: un sinonimo di qualità di cui fidarsi.",
-        "storyP3": "Quella che un tempo era una piccola officina è oggi un'azienda con uno showroom a Echandens e una filiale a Ginevra. Ma dietro questa crescita non c'è il caso — ci sono innumerevoli ore di lavoro, sacrifici e la convinzione che valesse la pena lottare per la massima qualità possibile, in ogni porta, ogni armadio, ogni dettaglio che altri forse non avrebbero nemmeno notato.",
-        "storyP4": "Perché PortMix, prima di tutto, non è solo un'azienda — è una famiglia. Una coppia che ha costruito tutto insieme, e tre figli cresciuti tra il profumo del legno e i racconti di lavoro a tavola. Ogni sforzo, ogni notte insonne, ogni passo avanti aveva un obiettivo silenzioso.",
-        "storyQuote": "Lasciare ai figli più di un nome ereditato — delle basi, un'opportunità e la sicurezza di poter continuare ciò che i genitori hanno iniziato con amore. Non come un obbligo, ma come parte di se stessi.",
+        "storyLead": [
+            "Alcune storie nascono con dei mezzi.",
+            "Altre nascono con una convinzione."
+        ],
+        "storyParagraphs": [
+            "Nel 2017, PortMix nasce senza capitale, senza reputazione, senza altra certezza se non questa: un lavoro onesto, svolto con rigore, trova sempre il proprio posto.",
+            "Nasuf Biljibani parte praticamente da zero. Porta con sé solo il proprio mestiere, appreso con pazienza, il gusto per il lavoro ben fatto e la volontà di costruire qualcosa che gli somigliasse. Un progetto che avrebbe portato il suo nome, ma soprattutto i valori che desiderava trasmettere alla propria famiglia.",
+            "I primi cantieri sono modesti. Eppure ognuno viene realizzato con lo stesso impegno. Una porta, un armadio, una cabina armadio: nessuna realizzazione è considerata più importante di un'altra. Perché dietro ogni commessa c'è una persona che accorda la propria fiducia."
+        ],
+        "storyEmphasis1": "Il tempo fa il suo corso.",
+        "storyParagraphs2": [
+            "I gesti diventano più precisi. L'esperienza affina lo sguardo. I clienti tornano, e parlano di PortMix ad altri. Quella che era solo un'officina diventa, poco a poco, un'azienda riconosciuta per la qualità del proprio lavoro, la sua serietà e la cura riservata ai minimi dettagli.",
+            "Oggi PortMix dispone di uno showroom a Echandens e di una filiale a Ginevra. Questa evoluzione non è frutto del caso. È il risultato di migliaia di ore di lavoro, di scelte a volte difficili, di sacrifici spesso invisibili e di un'esigenza che non è mai cambiata."
+        ],
+        "storyList": [
+            "Ogni porta viene montata con precisione.",
+            "Ogni armadio è pensato per durare.",
+            "Ogni cabina armadio è concepita come un pezzo unico.",
+            "E ogni finitura riceve la stessa attenzione, anche quando sarà notata solo da chi l'ha realizzata."
+        ],
+        "storyQualityLine": "Perché la qualità non si misura solo da ciò che si vede. Si riconosce anche in tutto ciò che resta invisibile.",
+        "familyIntro": "Ma PortMix è prima di tutto una storia di famiglia.",
+        "familyParagraphs": [
+            "Quella di una coppia che ha costruito la propria azienda insieme, giorno dopo giorno, con pazienza, coraggio e determinazione.",
+            "Quella di tre figli cresciuti al ritmo delle officine, tra il profumo del legno, i disegni tecnici stesi sul tavolo e conversazioni che, molto spesso, parlavano di lavoro tanto quanto di futuro."
+        ],
+        "familyEmphasis": [
+            "Ogni sforzo perseguiva lo stesso obiettivo: costruire molto più di un'azienda.",
+            "Costruire un'eredità."
+        ],
+        "familyClosingParagraph": "Non un'eredità fatta di muri o macchinari, ma di valori.",
+        "valuesLines": [
+            "Il rispetto della parola data.",
+            "L'amore per il lavoro ben fatto.",
+            "L'umiltà di fronte al mestiere.",
+            "E la convinzione che ciò che si costruisce con il cuore possa attraversare il tempo."
+        ],
+        "storyClosing": "Il resto appartiene a coloro che scriveranno il seguito di questa storia.",
         "valuesKicker": "I nostri valori",
         "valuesTitle": "Ciò che ci guida",
         "value1Title": "Qualità svizzera",

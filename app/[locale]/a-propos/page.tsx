@@ -43,35 +43,128 @@ export default async function AboutPage({
     setRequestLocale(locale);
     const t = await getTranslations('about');
 
+    const storyLead = t.raw('storyLead') as string[];
+    const storyParagraphs = t.raw('storyParagraphs') as string[];
+    const storyParagraphs2 = t.raw('storyParagraphs2') as string[];
+    const storyList = t.raw('storyList') as string[];
+    const familyParagraphs = t.raw('familyParagraphs') as string[];
+    const familyEmphasis = t.raw('familyEmphasis') as string[];
+    const valuesLines = t.raw('valuesLines') as string[];
+
     return (
         <>
             <PageHeader kicker={t('kicker')} title={t('title')} />
 
             {/* Story */}
-            <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">
-                <div className="grid items-start gap-12 lg:grid-cols-2">
-                    <Reveal>
-                        <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-                            <span className="text-brand">{t('storyTitle')}</span>
-                        </h2>
-                        <div className="mt-7 space-y-5 text-lg leading-relaxed text-cream/75">
-                            <p>{t('storyP1')}</p>
-                            <p>{t('storyP2')}</p>
-                            <p>{t('storyP3')}</p>
-                            <p>{t('storyP4')}</p>
-                        </div>
-                        <blockquote className="mt-8 border-l-2 border-brand pl-6 font-display text-xl italic leading-snug text-cream/90">
-                            “{t('storyQuote')}”
-                        </blockquote>
-                    </Reveal>
-                    <ImageReveal
-                        src="/images/placeholders/atelier.jpg"
-                        alt="PortMix SA"
-                        sizes="(min-width: 1024px) 50vw, 100vw"
-                        className="aspect-[4/5] rounded-2xl lg:sticky lg:top-28"
-                        delay={0.15}
-                    />
+            <section className="mx-auto max-w-3xl px-5 py-24 lg:px-8 lg:py-32">
+                <Reveal>
+                    <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+                        <span className="text-brand">{t('storyTitle')}</span>
+                    </h2>
+                </Reveal>
+
+                <Reveal delay={0.1} className="mt-8 space-y-1">
+                    {storyLead.map((line, i) => (
+                        <p
+                            key={i}
+                            className="font-display text-2xl italic leading-snug text-cream sm:text-3xl"
+                        >
+                            {line}
+                        </p>
+                    ))}
+                </Reveal>
+
+                <div className="mt-8 space-y-5 text-lg leading-relaxed text-cream/75">
+                    {storyParagraphs.map((p, i) => (
+                        <p key={i}>{p}</p>
+                    ))}
                 </div>
+
+                <Reveal className="my-12 text-center">
+                    <p className="font-display text-2xl font-bold text-brand sm:text-3xl">
+                        {t('storyEmphasis1')}
+                    </p>
+                </Reveal>
+
+                <div className="space-y-5 text-lg leading-relaxed text-cream/75">
+                    {storyParagraphs2.map((p, i) => (
+                        <p key={i}>{p}</p>
+                    ))}
+                </div>
+            </section>
+
+            {/* Atelier image break */}
+            <section className="mx-auto max-w-5xl px-5 lg:px-8">
+                <ImageReveal
+                    src="/images/placeholders/atelier.jpg"
+                    alt="PortMix SA"
+                    sizes="(min-width: 1024px) 60vw, 100vw"
+                    className="aspect-[16/9] rounded-2xl"
+                />
+            </section>
+
+            {/* Poetic list + family story */}
+            <section className="mx-auto max-w-3xl px-5 py-24 lg:px-8 lg:py-32">
+                <Reveal className="space-y-3 border-l-2 border-brand pl-6">
+                    {storyList.map((line, i) => (
+                        <p
+                            key={i}
+                            className="font-display text-xl italic leading-snug text-cream/90"
+                        >
+                            {line}
+                        </p>
+                    ))}
+                </Reveal>
+
+                <Reveal delay={0.1}>
+                    <p className="mt-10 text-lg leading-relaxed text-cream/75">
+                        {t('storyQualityLine')}
+                    </p>
+                </Reveal>
+
+                <Reveal className="mt-16 text-center">
+                    <p className="font-display text-2xl font-bold sm:text-3xl">
+                        {t('familyIntro')}
+                    </p>
+                </Reveal>
+
+                <div className="mt-8 space-y-5 text-lg leading-relaxed text-cream/75">
+                    {familyParagraphs.map((p, i) => (
+                        <p key={i}>{p}</p>
+                    ))}
+                </div>
+
+                <Reveal className="mt-10 space-y-1 text-center">
+                    {familyEmphasis.map((line, i) => (
+                        <p
+                            key={i}
+                            className="font-display text-xl font-bold text-brand sm:text-2xl"
+                        >
+                            {line}
+                        </p>
+                    ))}
+                </Reveal>
+
+                <p className="mt-8 text-center text-lg italic leading-relaxed text-cream/75">
+                    {t('familyClosingParagraph')}
+                </p>
+
+                <Reveal className="mt-10 space-y-3 border-l-2 border-brand pl-6">
+                    {valuesLines.map((line, i) => (
+                        <p
+                            key={i}
+                            className="font-display text-xl italic leading-snug text-cream/90"
+                        >
+                            {line}
+                        </p>
+                    ))}
+                </Reveal>
+
+                <Reveal className="mt-16 text-center">
+                    <p className="font-display text-xl italic text-cream/70">
+                        {t('storyClosing')}
+                    </p>
+                </Reveal>
             </section>
 
             {/* Values */}

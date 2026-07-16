@@ -1,5 +1,12 @@
-// SVG recreation of the PortMix SA logo (red wordmark + dark italic tagline).
-// Replace with the client's original vector file when available.
+import Image from 'next/image';
+
+// Client's real logo artwork (public/images/brand). The source file's
+// tagline ("intérieurs d'exception") is near-black, which disappears on
+// our dark header/footer — on `light` backgrounds we swap in a cream
+// recolor of just that layer while the red wordmark stays the original,
+// untouched artwork. On non-dark placements we render the source file as-is.
+const ASPECT = 1754 / 411;
+
 export default function Logo({
     className = 'h-9 w-auto',
     light = false
@@ -7,36 +14,39 @@ export default function Logo({
     className?: string;
     light?: boolean;
 }) {
+    if (!light) {
+        return (
+            <span className={`relative block ${className}`} style={{ aspectRatio: ASPECT }}>
+                <Image
+                    src="/images/brand/logo-full.png"
+                    alt="PortMix SA — intérieurs d'exception"
+                    fill
+                    priority
+                    sizes="220px"
+                    className="object-contain"
+                />
+            </span>
+        );
+    }
+
     return (
-        <svg
-            viewBox="0 0 340 92"
-            className={className}
-            aria-label="PortMix SA — intérieurs d'exception"
-            role="img"
-        >
-            <text
-                x="0"
-                y="52"
-                fontFamily="var(--font-sora), Arial, sans-serif"
-                fontSize="52"
-                fontWeight="800"
-                fill="#e32526"
-                letterSpacing="-1.5"
-            >
-                PortMix SA
-            </text>
-            <text
-                x="112"
-                y="82"
-                fontFamily="var(--font-sora), Arial, sans-serif"
-                fontSize="24"
-                fontWeight="700"
-                fontStyle="italic"
-                fill={light ? '#f4f0ea' : '#2b2b2b'}
-                letterSpacing="-0.5"
-            >
-                intérieurs d&apos;exception
-            </text>
-        </svg>
+        <span className={`relative block ${className}`} style={{ aspectRatio: ASPECT }}>
+            <Image
+                src="/images/brand/logo-wordmark.png"
+                alt="PortMix SA — intérieurs d'exception"
+                fill
+                priority
+                sizes="220px"
+                className="object-contain"
+            />
+            <Image
+                src="/images/brand/logo-tagline-cream.png"
+                alt=""
+                aria-hidden
+                fill
+                sizes="220px"
+                className="object-contain"
+            />
+        </span>
     );
 }

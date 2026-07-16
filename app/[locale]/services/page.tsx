@@ -9,8 +9,8 @@ import Magnetic from '@/components/Magnetic';
 import { buildMetadata } from '@/lib/seo';
 
 const SERVICES = [
-    { key: 'portes', image: '/images/placeholders/porte-2.jpg' },
-    { key: 'armoires', image: '/images/placeholders/armoire-1.jpg' },
+    { key: 'portes', image: '/images/placeholders/porte-2.png' },
+    { key: 'armoires', image: '/images/placeholders/armoire-services.png' },
     { key: 'dressings', image: '/images/placeholders/dressing-2.jpg' }
 ] as const;
 

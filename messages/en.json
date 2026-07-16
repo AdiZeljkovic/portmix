@@ -17,7 +17,8 @@
         "services": "Services",
         "realisations": "Projects",
         "contact": "Contact",
-        "cta": "Get in touch"
+        "cta": "Get in touch",
+        "theme": "Switch theme"
     },
     "hero": {
         "kicker": "Bespoke interior joinery · Vaud & Geneva",

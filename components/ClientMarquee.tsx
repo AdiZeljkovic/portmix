@@ -11,7 +11,7 @@ export default function ClientMarquee() {
                 <div
                     key={`${c.slug}-${ariaHidden ? 'dup' : 'orig'}-${i}`}
                     className={`mr-6 flex h-16 w-40 shrink-0 items-center justify-center rounded-xl px-5 ${
-                        c.logoOnDark ? 'bg-ink' : 'bg-cream/95'
+                        c.logoOnDark ? 'bg-ink-fixed' : 'bg-cream-fixed/95'
                     }`}
                 >
                     {c.logo ? (
@@ -23,7 +23,7 @@ export default function ClientMarquee() {
                             className="max-h-9 w-auto object-contain"
                         />
                     ) : (
-                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/60">
+                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink-fixed/60">
                             {c.name}
                         </span>
                     )}

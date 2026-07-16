@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Sora } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
@@ -27,6 +27,14 @@ const sora = Sora({
 export function generateStaticParams() {
     return routing.locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+    themeColor: '#181614'
+};
+
+// Runs before first paint: applies the stored theme (default dark) so there is
+// no flash of the wrong theme, and keeps the theme-color meta in sync.
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('pm-theme');if(t!=='light'&&t!=='dark'){t='dark'}document.documentElement.dataset.theme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='light'?'#f7f3ec':'#181614')}catch(e){document.documentElement.dataset.theme='dark'}})()`;
 
 export async function generateMetadata({
     params
@@ -57,8 +65,13 @@ export default async function LocaleLayout({
     const t = await getTranslations({ locale, namespace: 'meta' });
 
     return (
-        <html lang={locale} className={`${inter.variable} ${sora.variable} antialiased`}>
+        <html
+            lang={locale}
+            className={`${inter.variable} ${sora.variable} antialiased`}
+            suppressHydrationWarning
+        >
             <body className="min-h-screen flex flex-col bg-ink text-cream">
+                <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
                 <StructuredData locale={locale} description={t('description')} />
                 <NextIntlClientProvider>
                     <Preloader />

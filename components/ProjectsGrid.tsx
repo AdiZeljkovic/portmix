@@ -34,7 +34,7 @@ export default function ProjectsGrid({
                             <TiltCard className="flex h-full flex-col rounded-2xl border border-line bg-ink-card p-6">
                                 <div
                                     className={`flex h-20 items-center justify-center rounded-xl p-4 ${
-                                        client?.logoOnDark ? 'bg-ink' : 'bg-cream/95'
+                                        client?.logoOnDark ? 'bg-ink-fixed' : 'bg-cream-fixed/95'
                                     }`}
                                 >
                                     {client?.logo ? (
@@ -46,7 +46,7 @@ export default function ProjectsGrid({
                                             className="max-h-11 w-auto object-contain"
                                         />
                                     ) : (
-                                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/60">
+                                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink-fixed/60">
                                             {client?.name ?? '—'}
                                         </span>
                                     )}

@@ -25,7 +25,7 @@ export default function Footer() {
             </div>
             <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-3 lg:px-8">
                 <div>
-                    <Logo className="h-12 w-auto" light />
+                    <Logo className="h-12 w-auto" />
                     <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted">
                         {t('footer.tagline')}
                     </p>

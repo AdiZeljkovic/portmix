@@ -61,7 +61,7 @@ export default function Header() {
         >
             <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
                 <Link href="/" aria-label="PortMix SA — Accueil" className="shrink-0">
-                    <Logo className="h-10 w-auto" light />
+                    <Logo className="h-10 w-auto" />
                 </Link>
 
                 {/* Desktop nav */}

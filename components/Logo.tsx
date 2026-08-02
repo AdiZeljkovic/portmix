@@ -29,9 +29,6 @@ export default function Logo({
         );
     }
 
-    // In the light theme the header/footer backgrounds are no longer dark,
-    // so the original artwork (near-black tagline) is the correct variant —
-    // both are rendered and the active one is picked by html[data-theme].
     return (
         <span className={`relative block ${className}`} style={{ aspectRatio: ASPECT }}>
             <Image
@@ -40,25 +37,15 @@ export default function Logo({
                 fill
                 priority
                 sizes="220px"
-                className="object-contain light:hidden"
+                className="object-contain"
             />
             <Image
                 src="/images/brand/logo-tagline-cream.png"
                 alt=""
                 aria-hidden
                 fill
-                priority
                 sizes="220px"
-                className="object-contain light:hidden"
-            />
-            <Image
-                src="/images/brand/logo-full.png"
-                alt=""
-                aria-hidden
-                fill
-                priority
-                sizes="220px"
-                className="hidden object-contain light:block"
+                className="object-contain"
             />
         </span>
     );

@@ -7,7 +7,6 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { COMPANY } from '@/lib/company';
 import Logo from './Logo';
 import LanguageSwitcher from './LanguageSwitcher';
-import ThemeSwitcher from './ThemeSwitcher';
 
 const NAV_ITEMS = [
     { href: '/', key: 'home' },
@@ -84,7 +83,6 @@ export default function Header() {
                 </nav>
 
                 <div className="hidden items-center gap-5 lg:flex">
-                    <ThemeSwitcher />
                     <LanguageSwitcher />
                     <a
                         href={COMPANY.phoneHref}
@@ -97,7 +95,6 @@ export default function Header() {
 
                 {/* Mobile toggle */}
                 <div className="flex items-center gap-4 lg:hidden">
-                    <ThemeSwitcher />
                     <LanguageSwitcher />
                     <button
                         onClick={() => setOpen(!open)}

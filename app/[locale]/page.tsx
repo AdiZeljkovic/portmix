@@ -14,8 +14,8 @@ import ProjectsGrid from '@/components/ProjectsGrid';
 import { CURRENT_PROJECTS } from '@/lib/projects';
 
 const SERVICES = [
-    { key: 'Portes', image: '/images/placeholders/porte-2.png' },
-    { key: 'Armoires', image: '/images/placeholders/armoire-services.png' },
+    { key: 'Portes', image: '/images/placeholders/porte-2.jpg' },
+    { key: 'Armoires', image: '/images/placeholders/armoire-services.jpg' },
     { key: 'Dressings', image: '/images/placeholders/dressing-1.jpg' }
 ] as const;
 

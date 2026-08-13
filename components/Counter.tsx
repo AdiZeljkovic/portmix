@@ -20,7 +20,9 @@ export default function Counter({
     const ref = useRef<HTMLSpanElement>(null);
     const inView = useInView(ref, { once: true, margin: '-60px' });
     const reduce = useReducedMotion();
-    const [display, setDisplay] = useState(reduce ? target : 0);
+    // Always start at 0 so server and client first render match; the effect
+    // below snaps straight to the target for reduced-motion users.
+    const [display, setDisplay] = useState(0);
 
     useEffect(() => {
         if (!inView || reduce) {

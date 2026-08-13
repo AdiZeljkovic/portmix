@@ -1,7 +1,7 @@
 {
     "meta": {
         "title": "PortMix SA | Innenausbau nach Mass in der Westschweiz",
-        "description": "Türen, Schränke und Ankleiden nach Mass — entworfen, gefertigt und montiert vom selben Team. Familienunternehmen seit 2017. Showroom in Echandens, Niederlassung in Genf.",
+        "description": "Türen, Schränke und Ankleiden nach Mass — entworfen, gefertigt und montiert vom selben Team. Familienunternehmen seit 2017. Showroom in Echandens.",
         "titleAbout": "Unsere Geschichte | PortMix SA",
         "descriptionAbout": "Vom familiären Handwerksbetrieb 2017 zum Showroom in Echandens: die Geschichte von PortMix SA, gegründet von Nasuf Biljibani.",
         "titleServices": "Türen, Schränke & Ankleiden nach Mass | PortMix SA",
@@ -17,7 +17,19 @@
         "services": "Leistungen",
         "realisations": "Referenzen",
         "contact": "Kontakt",
-        "cta": "Kontakt aufnehmen"
+        "cta": "Kontakt aufnehmen",
+        "openMenu": "Menü öffnen",
+        "closeMenu": "Menü schliessen"
+    },
+    "notFound": {
+        "title": "Seite nicht gefunden",
+        "text": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+        "cta": "Zurück zur Startseite"
+    },
+    "error": {
+        "title": "Ein Fehler ist aufgetreten",
+        "text": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+        "retry": "Erneut versuchen"
     },
     "hero": {
         "kicker": "Innenschreinerei nach Mass · Waadt & Genf",
@@ -70,6 +82,7 @@
         "ctaButton": "Beratung anfragen"
     },
     "about": {
+        "imageAlt": "Die PortMix-Schreinerwerkstatt in Echandens",
         "kicker": "Unsere Geschichte",
         "title": "Eine Geschichte von Familie und Arbeit",
         "storyTitle": "Seit 2017",

@@ -46,7 +46,7 @@ export default function ProjectsGrid({
                                             className="max-h-11 w-auto object-contain"
                                         />
                                     ) : (
-                                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/60">
+                                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/75">
                                             {client?.name ?? '—'}
                                         </span>
                                     )}

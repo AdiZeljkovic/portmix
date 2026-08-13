@@ -1,7 +1,7 @@
 {
     "meta": {
-        "title": "PortMix SA | Falegnameria d'interni su misura nella Svizzera romanda",
-        "description": "Porte, armadi e cabine armadio su misura, progettati, realizzati e installati dallo stesso team. Azienda familiare svizzera dal 2017. Showroom a Echandens, filiale a Ginevra.",
+        "title": "PortMix SA | Falegnameria su misura, Svizzera romanda",
+        "description": "Porte, armadi e cabine armadio su misura, progettati, realizzati e installati dallo stesso team. Azienda familiare svizzera dal 2017. Showroom a Echandens.",
         "titleAbout": "La nostra storia | PortMix SA",
         "descriptionAbout": "Dal laboratorio familiare del 2017 allo showroom di Echandens: la storia di PortMix SA, fondata da Nasuf Biljibani.",
         "titleServices": "Porte, armadi e cabine armadio su misura | PortMix SA",
@@ -17,7 +17,19 @@
         "services": "Servizi",
         "realisations": "Realizzazioni",
         "contact": "Contatto",
-        "cta": "Contattaci"
+        "cta": "Contattaci",
+        "openMenu": "Apri il menu",
+        "closeMenu": "Chiudi il menu"
+    },
+    "notFound": {
+        "title": "Pagina non trovata",
+        "text": "La pagina che cercate non esiste o è stata spostata.",
+        "cta": "Torna alla home"
+    },
+    "error": {
+        "title": "Si è verificato un errore",
+        "text": "Qualcosa è andato storto. Vi preghiamo di riprovare.",
+        "retry": "Riprova"
     },
     "hero": {
         "kicker": "Falegnameria d'interni su misura · Vaud e Ginevra",
@@ -70,6 +82,7 @@
         "ctaButton": "Richiedi una consulenza"
     },
     "about": {
+        "imageAlt": "Il laboratorio di falegnameria PortMix a Echandens",
         "kicker": "La nostra storia",
         "title": "Una storia di famiglia e di lavoro",
         "storyTitle": "Dal 2017",

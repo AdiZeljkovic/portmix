@@ -1,15 +1,12 @@
 import { COMPANY } from '@/lib/company';
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.portmix.ch';
+import { BASE_URL } from '@/lib/site';
 
 // schema.org LocalBusiness markup for local SEO / Google Business rich
 // results. No `image`/`sameAs` yet — add once real photos and verified
 // social profiles exist, rather than pointing search engines at placeholders.
 export default function StructuredData({
-    locale,
     description
 }: {
-    locale: string;
     description: string;
 }) {
     const data = {
@@ -19,7 +16,6 @@ export default function StructuredData({
         url: BASE_URL,
         telephone: COMPANY.phone,
         email: COMPANY.email,
-        inLanguage: locale,
         description,
         foundingDate: String(COMPANY.foundedYear),
         address: {

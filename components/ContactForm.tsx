@@ -7,7 +7,7 @@ import { Send, CheckCircle2 } from 'lucide-react';
 type Status = 'idle' | 'sending' | 'success' | 'error';
 
 const inputClass =
-    'w-full rounded-xl border border-line bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream/35 outline-none transition-colors focus:border-brand';
+    'w-full rounded-xl border border-line bg-ink px-4 py-3 text-sm text-cream placeholder:text-cream/55 outline-none transition-colors focus:border-brand';
 
 export default function ContactForm() {
     const t = useTranslations('contact');
@@ -45,36 +45,48 @@ export default function ContactForm() {
         >
             <h2 className="font-display text-2xl font-bold">{t('formTitle')}</h2>
 
+            {/* Honeypot — hidden from real users, bots fill it and get filtered */}
+            <input
+                type="text"
+                name="company"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
+
             <div className="mt-7 grid gap-5 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <label htmlFor="name" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-cream/60">
                         {t('formName')} *
                     </label>
-                    <input id="name" name="name" required className={inputClass} />
+                    <input id="name" name="name" required maxLength={200} className={inputClass} />
                 </div>
                 <div>
                     <label htmlFor="email" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-cream/60">
                         {t('formEmail')} *
                     </label>
-                    <input id="email" name="email" type="email" required className={inputClass} />
+                    <input id="email" name="email" type="email" required maxLength={254} className={inputClass} />
                 </div>
                 <div>
                     <label htmlFor="phone" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-cream/60">
                         {t('formPhone')}
                     </label>
-                    <input id="phone" name="phone" type="tel" className={inputClass} />
+                    <input id="phone" name="phone" type="tel" maxLength={50} className={inputClass} />
                 </div>
                 <div className="sm:col-span-2">
                     <label htmlFor="message" className="mb-2 block text-xs font-semibold uppercase tracking-wider text-cream/60">
                         {t('formMessage')} *
                     </label>
-                    <textarea id="message" name="message" required rows={5} className={inputClass} />
+                    <textarea id="message" name="message" required rows={5} maxLength={5000} className={inputClass} />
                 </div>
             </div>
 
-            {status === 'error' && (
-                <p className="mt-5 text-sm text-brand">{t('formError')}</p>
-            )}
+            <div aria-live="polite">
+                {status === 'error' && (
+                    <p className="mt-5 text-sm text-brand">{t('formError')}</p>
+                )}
+            </div>
 
             <button
                 type="submit"

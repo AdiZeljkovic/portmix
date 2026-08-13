@@ -1,20 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ReactLenis } from 'lenis/react';
+import { useEffect, useRef } from 'react';
+import { ReactLenis, type LenisRef } from 'lenis/react';
 
-// Buttery smooth scrolling. Disabled for users preferring reduced motion.
+// Buttery smooth scrolling. The wrapper always renders so the server-rendered
+// DOM is never torn down after hydration; for users preferring reduced motion
+// the lenis instance is simply stopped and native scrolling takes over.
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
-    const [enabled, setEnabled] = useState(false);
+    const lenisRef = useRef<LenisRef>(null);
 
     useEffect(() => {
-        setEnabled(!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const apply = () => {
+            const lenis = lenisRef.current?.lenis;
+            if (!lenis) return;
+            if (mq.matches) lenis.stop();
+            else lenis.start();
+        };
+        apply();
+        mq.addEventListener('change', apply);
+        return () => mq.removeEventListener('change', apply);
     }, []);
 
-    if (!enabled) return <>{children}</>;
-
     return (
-        <ReactLenis root options={{ lerp: 0.09, wheelMultiplier: 1.05 }}>
+        <ReactLenis root ref={lenisRef} options={{ lerp: 0.09, wheelMultiplier: 1.05 }}>
             {children}
         </ReactLenis>
     );

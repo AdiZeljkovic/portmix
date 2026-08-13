@@ -23,7 +23,7 @@ export default function ClientMarquee() {
                             className="max-h-9 w-auto object-contain"
                         />
                     ) : (
-                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/60">
+                        <span className="text-center text-[11px] font-semibold uppercase leading-tight tracking-wide text-ink/75">
                             {c.name}
                         </span>
                     )}

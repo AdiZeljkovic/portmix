@@ -63,7 +63,7 @@ export default async function LocaleLayout({
     return (
         <html lang={locale} className={`${inter.variable} ${sora.variable} antialiased`}>
             <body className="min-h-screen flex flex-col bg-ink text-cream">
-                <StructuredData locale={locale} description={t('description')} />
+                <StructuredData description={t('description')} />
                 <NextIntlClientProvider>
                     <Preloader />
                     <Cursor />

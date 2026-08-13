@@ -1,10 +1,10 @@
 {
     "meta": {
         "title": "PortMix SA | Bespoke Interior Joinery in Western Switzerland",
-        "description": "Made-to-measure doors, wardrobes and walk-in closets — designed, built and installed by the same team. Family business since 2017. Showroom in Echandens, branch in Geneva.",
+        "description": "Made-to-measure doors, wardrobes and walk-in closets — designed, built and installed by the same team. Family business since 2017. Showroom in Echandens.",
         "titleAbout": "Our Story | PortMix SA",
         "descriptionAbout": "From a family workshop in 2017 to a showroom in Echandens: the story of PortMix SA, founded by Nasuf Biljibani.",
-        "titleServices": "Made-to-Measure Doors, Wardrobes & Walk-in Closets | PortMix SA",
+        "titleServices": "Doors, Wardrobes & Walk-in Closets | PortMix SA",
         "descriptionServices": "Doors of all kinds, wardrobes and walk-in closets made to measure in Western Switzerland. One team accompanies you from consultation to installation.",
         "titleRealisations": "Projects | Bespoke Joinery in Vaud & Geneva",
         "descriptionRealisations": "Villas, apartments and offices across Western Switzerland: discover our made-to-measure doors, wardrobes and walk-in closets by PortMix SA.",
@@ -17,7 +17,19 @@
         "services": "Services",
         "realisations": "Projects",
         "contact": "Contact",
-        "cta": "Get in touch"
+        "cta": "Get in touch",
+        "openMenu": "Open menu",
+        "closeMenu": "Close menu"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "text": "The page you are looking for doesn't exist or has been moved.",
+        "cta": "Back to home"
+    },
+    "error": {
+        "title": "Something went wrong",
+        "text": "An unexpected error occurred. Please try again.",
+        "retry": "Try again"
     },
     "hero": {
         "kicker": "Bespoke interior joinery · Vaud & Geneva",
@@ -70,6 +82,7 @@
         "ctaButton": "Request a consultation"
     },
     "about": {
+        "imageAlt": "The PortMix joinery workshop in Echandens",
         "kicker": "Our Story",
         "title": "A story of family and hard work",
         "storyTitle": "Since 2017",

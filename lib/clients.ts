@@ -65,7 +65,7 @@ export const CLIENTS: Client[] = [
         slug: 'marti-construction-sa',
         logo: '/images/clients/marti-construction-sa.svg'
     },
-    { name: 'Pizzera-Poletti SA', slug: 'pizzera-poletti-sa', logo: '/images/clients/pizzera-poletti-sa.svg' },
+    { name: 'Pizzera-Poletti SA', slug: 'pizzera-poletti-sa', logo: '/images/clients/pizzera-poletti-sa.png' },
     { name: 'PP Integra SA', slug: 'pp-integra-sa', logo: '/images/clients/pp-integra-sa.png' },
     { name: 'NewMind', slug: 'newmind', logo: '/images/clients/newmind.svg', logoOnDark: true },
     { name: 'Gottaz', slug: 'gottaz', logo: null },

@@ -49,6 +49,16 @@ export default function Header() {
         };
     }, [open]);
 
+    // Close the mobile menu on Escape
+    useEffect(() => {
+        if (!open) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setOpen(false);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [open]);
+
     return (
         <header
             className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
@@ -98,7 +108,8 @@ export default function Header() {
                     <LanguageSwitcher />
                     <button
                         onClick={() => setOpen(!open)}
-                        aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+                        aria-label={open ? t('closeMenu') : t('openMenu')}
+                        aria-expanded={open}
                         className="text-cream"
                     >
                         {open ? <X size={26} /> : <Menu size={26} />}

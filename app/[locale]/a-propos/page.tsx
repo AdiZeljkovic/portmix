@@ -97,7 +97,7 @@ export default async function AboutPage({
             <section className="mx-auto max-w-5xl px-5 lg:px-8">
                 <ImageReveal
                     src="/images/placeholders/atelier.jpg"
-                    alt="PortMix SA"
+                    alt={t('imageAlt')}
                     sizes="(min-width: 1024px) 60vw, 100vw"
                     className="aspect-[16/9] rounded-2xl"
                 />
@@ -223,7 +223,7 @@ export default async function AboutPage({
                                 <div
                                     className={`mx-auto flex h-24 w-24 items-center justify-center rounded-full font-display text-2xl font-bold ${
                                         member.placeholder
-                                            ? 'border border-dashed border-cream/25 text-cream/40'
+                                            ? 'border border-dashed border-cream/25 text-cream/60'
                                             : 'bg-gradient-to-br from-brand to-brand-dark text-white'
                                     }`}
                                 >
@@ -238,7 +238,7 @@ export default async function AboutPage({
                                 </h3>
                                 <p
                                     className={`mt-2 text-sm ${
-                                        member.placeholder ? 'text-cream/40' : 'text-brand'
+                                        member.placeholder ? 'text-cream/60' : 'text-brand'
                                     }`}
                                 >
                                     {t(member.roleKey)}

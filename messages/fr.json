@@ -1,7 +1,7 @@
 {
     "meta": {
-        "title": "PortMix SA | Menuiserie intérieure sur mesure en Suisse romande",
-        "description": "Portes, armoires et dressings sur mesure, conçus, fabriqués et posés par la même équipe. Entreprise familiale suisse depuis 2017. Showroom à Echandens, succursale à Genève.",
+        "title": "PortMix SA | Menuiserie sur mesure en Suisse romande",
+        "description": "Portes, armoires et dressings sur mesure, conçus, fabriqués et posés par la même équipe. Entreprise familiale suisse depuis 2017. Showroom à Echandens.",
         "titleAbout": "Notre histoire | PortMix SA",
         "descriptionAbout": "De l'atelier familial de 2017 au showroom d'Echandens : découvrez l'histoire de PortMix SA, entreprise de menuiserie intérieure fondée par Nasuf Biljibani.",
         "titleServices": "Portes, armoires & dressings sur mesure | PortMix SA",
@@ -17,7 +17,19 @@
         "services": "Services",
         "realisations": "Réalisations",
         "contact": "Contact",
-        "cta": "Nous contacter"
+        "cta": "Nous contacter",
+        "openMenu": "Ouvrir le menu",
+        "closeMenu": "Fermer le menu"
+    },
+    "notFound": {
+        "title": "Page introuvable",
+        "text": "La page que vous cherchez n'existe pas ou a été déplacée.",
+        "cta": "Retour à l'accueil"
+    },
+    "error": {
+        "title": "Une erreur est survenue",
+        "text": "Quelque chose s'est mal passé. Veuillez réessayer.",
+        "retry": "Réessayer"
     },
     "hero": {
         "kicker": "Menuiserie intérieure sur mesure · Vaud & Genève",
@@ -70,6 +82,7 @@
         "ctaButton": "Demander un conseil"
     },
     "about": {
+        "imageAlt": "L'atelier de menuiserie PortMix à Echandens",
         "kicker": "Notre histoire",
         "title": "Une histoire de famille et de travail",
         "storyTitle": "Depuis 2017",

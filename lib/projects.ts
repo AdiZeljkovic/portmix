@@ -59,7 +59,8 @@ export const COMPLETED_PROJECTS: Project[] = [
     { name: 'Le Day', company: 'ALPENDA' },
     { name: 'Mont de Lavaux', company: 'BEG SA' },
     { name: 'Parcelle', company: 'Salchegger Sàrl' },
-    { name: 'Evionnaz Maison Nature Eco', company: 'Sàrl' },
+    // TODO: full company name missing in the client's spreadsheet (only "Sàrl") — ask the client
+    { name: 'Evionnaz Maison Nature Eco', company: null },
     { name: 'Grand Montfleury', company: 'ALPENDA' },
     { name: 'Bernex', company: 'Implenia Suisse SA' },
     { name: 'Boutique Ferronato', company: null },

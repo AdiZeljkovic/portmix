@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
 import { routing } from '@/i18n/routing';
+import { BASE_URL } from '@/lib/site';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.portmix.ch';
+// OpenGraph wants language_TERRITORY locales, not bare language codes.
+const OG_LOCALES: Record<string, string> = {
+    fr: 'fr_CH',
+    de: 'de_CH',
+    en: 'en_US',
+    it: 'it_CH'
+};
 
-function urlFor(locale: string, path: string) {
+export function urlFor(locale: string, path: string) {
     return locale === routing.defaultLocale ? `${BASE_URL}${path || '/'}` : `${BASE_URL}/${locale}${path}`;
 }
 
@@ -37,7 +44,10 @@ export function buildMetadata({
             title,
             description,
             siteName: 'PortMix SA',
-            locale,
+            locale: OG_LOCALES[locale] ?? locale,
+            alternateLocale: routing.locales
+                .filter((l) => l !== locale)
+                .map((l) => OG_LOCALES[l] ?? l),
             type: 'website',
             url: urlFor(locale, path)
         }

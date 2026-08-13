@@ -20,7 +20,7 @@ export default function Preloader() {
         const timer = setTimeout(() => {
             setShow(false);
             document.body.style.overflow = '';
-        }, 2100);
+        }, 1600);
         return () => {
             clearTimeout(timer);
             document.body.style.overflow = '';

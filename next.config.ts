@@ -15,6 +15,27 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   poweredByHeader: false,
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+      {
+        // Client logo SVGs are repo-controlled, but serve them inert anyway
+        // (the image-optimizer CSP doesn't cover direct /images/... requests).
+        source: "/images/:path*.svg",
+        headers: [
+          { key: "Content-Security-Policy", value: "default-src 'none'; style-src 'unsafe-inline'; sandbox;" },
+        ],
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

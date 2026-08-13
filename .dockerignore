@@ -1,0 +1,26 @@
+# Bez ovoga `COPY . .` uvuce lokalne `node_modules` (Windows/macOS binari koji
+# u linux slici ne rade) i STARI `.next` — build onda gradi preko zateceног
+# izlaza i deploya se nesto sto niko nije provjerio.
+node_modules
+.next
+out
+dist
+
+.git
+.gitignore
+.github
+
+# dokumentacija i alati — u slici nemaju sta raditi
+*.md
+!README.md
+.vscode
+.idea
+.DS_Store
+
+# lokalne tajne nikad ne ulaze u sliku
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+yarn-error.log*

@@ -4,8 +4,27 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  /**
+   * Standalone server — obavezno za deploy na Futura server.
+   *
+   * `next start` ucitava cijeli `node_modules` u RAM: mjereno ~490 MB naspram
+   * ~130 MB za standalone na istom sajtu. Uz to Dockerfile pokrece bas
+   * `.next/standalone/server.js`; sam config nije dovoljan.
+   */
+  output: "standalone",
   images: {
-    formats: ["image/avif", "image/webp"],
+    /**
+     * ⚠️ AVIF je namjerno iskljucen.
+     *
+     * 12.8.2026. je AVIF kodiranje oborilo asgklima.com: kontejner na 511 od
+     * 512 MB, 99% procesora, Node ubijen poslije 44 sata. Mjereno tada, ista
+     * slika: AVIF 93 KB / 2,44 s, WebP 176 KB / 0,70 s — a memorija se
+     * poslije kodiranja NE VRACA (sedam sirina: 203 → 298 MB i ostaje).
+     *
+     * Posao radi nativna biblioteka, pa ga granica hipa ne pokriva. WebP je
+     * oko 80 KB veci po slici; sajt radi.
+     */
+    formats: ["image/webp"],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     // Client/partner logos are served as SVG; scope the relaxed CSP to
     // just those optimized images.

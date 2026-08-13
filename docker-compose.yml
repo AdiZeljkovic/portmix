@@ -1,0 +1,44 @@
+# PortMix — jedan servis, bez baze.
+#
+# Traefik oznake NE pisemo ovdje: Dokploy ih sam dopise kad se domena podesi
+# u njegovom sucelju. Ovdje stoji samo ono sto je nase.
+
+services:
+  # ⚠️ Ime servisa je PREFIKSIRANO imenom projekta.
+  #
+  # Svi klijenti dijele Traefikovu `dokploy-network`, a Dockerov DNS razrjesava
+  # gola imena preko cijele mreze. Genericko `web`/`app` bi se sudarilo sa
+  # drugim stackom — vec vidjeno uzivo: klijentski servis `admin` je oteo mail
+  # serveru `admin` lookup i oborio webmail.
+  portmix-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+    # Sajt je bez baze i bez uploada, pa nema imenovanih volumena — sve sto
+    # aplikacija servira dolazi iz slike.
+    #
+    # Granica je IZNAD kape za hip (256 MB) jer obrada slika trosi nativnu
+    # memoriju koju ta kapa ne pokriva. Mjereno na sestrinskom sajtu: 512 MB
+    # je bilo tijesno DOK je AVIF bio ukljucen; ovdje je iskljucen.
+    mem_limit: 384m
+    healthcheck:
+      # Bez ovoga Docker ne razlikuje "radi" od "stoji a ne odgovara" — tacno
+      # taj slucaj je 12.8.2026. drzao asgklima.com oborenim.
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/en').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    # NULA portova mapiranih na host — proxy se spaja preko interne mreze.
+    networks:
+      - dokploy-network
+      - default
+
+networks:
+  dokploy-network:
+    external: true

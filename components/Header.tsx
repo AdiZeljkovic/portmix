@@ -65,7 +65,7 @@ export default function Header() {
                 hidden && !open ? '-translate-y-full' : 'translate-y-0'
             } ${
                 scrolled || open
-                    ? 'bg-ink/90 backdrop-blur-md border-b border-line'
+                    ? 'bg-ink/90 backdrop-blur-md shadow-[0_1px_0_rgba(0,0,0,0.35)]'
                     : 'bg-transparent'
             }`}
         >

@@ -52,6 +52,36 @@ Compose ima `healthcheck` na `/en`. Bez njega Docker ne razlikuje „radi" od
 FuturaOS uz to provjerava domenu spolja svakih 5 minuta i, ako padne dva puta
 zaredom, sam pokuša dignuti kontejner i javi na Telegram.
 
+## 🚨 Pošta ide preko Microsoft 365 — DNS zapisi se NE DIRAJU
+
+`portmix.ch` koristi Microsoft 365 za mail. Ovi zapisi u Cloudflareu moraju
+ostati netaknuti; brisanje bilo kojeg obara klijentu poštu:
+
+```
+MX    portmix.ch          portmix-ch.mail.protection.outlook.com
+TXT   portmix.ch          v=spf1 include:spf.protection.outlook.com -all
+TXT   portmix.ch          MS=ms57891872            (potvrda domene za M365)
+TXT   portmix.ch          google-site-verification=…
+TXT   _dmarc.portmix.ch   v=DMARC1;p=quarantine
+CNAME autodiscover        autodiscover.outlook.com
+NS    _domainkey          ns11/ns12.infomaniak.ch
+```
+
+⚠️ Hosting je namjerno na **Gratis** paketu bez mailova. Uključivanje mailova
+kroz FuturaOS bi upisalo NAŠ MX i SPF i **prekinulo im poštu**.
+
+## 📌 Zapamćeno sa prvog deploya
+
+- Apex je imao **dva** `A` zapisa (stari hosting). FuturaOS mijenja samo prvi,
+  pa je drugi ostao i sajt bi radio otprilike svaki drugi put — obrisan ručno.
+- `npm ci` je padao: `@swc/helpers` nije bio usaglašen jer `next` prikiva
+  0.5.15, a `next-intl` traži ≥0.5.17. Riješeno brisanjem `node_modules` i
+  locka pa čistim `npm install`. `npm install --package-lock-only` NIJE
+  dovoljan — zadrži staru verziju iz postojećeg `node_modules`.
+- Dokploy app je prebačen sa `nixpacks` na `dockerfile` da koristi Dockerfile
+  iz ovog repoa (standalone). Rezultat: **45 MB** umjesto ~500 MB.
+- Granica memorije se u Dokployu upisuje **u bajtima** (384 MB = 402653184).
+
 ## Prvi deploy
 
 1. Dokploy → nova aplikacija, izvor: `github.com/AdiZeljkovic/portmix`,

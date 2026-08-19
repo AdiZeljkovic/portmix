@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="bs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Signature Studio</title>
+<meta name="description" content="Email signature generator for Outlook, Gmail and mobile clients.">
+<!-- Interni alat, ne dio javnog sajta: stoji na portmix.ch samo zato što
+     generisani potpis mora slike povlačiti sa stalne adrese. Bez ovoga bi
+     ga pretraživači indeksirali kao stranicu klijentovog sajta. -->
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root{
+    --accent:#C92A2F;
+    --ink:#1c1a17; --ink-2:#4b453e; --ink-3:#7d746a; --ink-4:#a99f93;
+    --paper:#f4f0e9; --panel:#fffdfa; --panel-2:#f9f5ee;
+    --rule:#e4dbcd; --rule-2:#efe8dd;
+    --ok:#3f7d4e; --warn:#a5641c; --bad:#b3322f;
+    --r-lg:20px;
+    --shadow:0 1px 2px rgba(40,30,20,.04), 0 14px 34px rgba(60,44,26,.07);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;min-height:100vh;color:var(--ink);
+    font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    font-size:14px;line-height:1.55;
+    background:linear-gradient(180deg,#faf7f2 0%,var(--paper) 40%,#f2ece2 100%);
+    background-attachment:fixed;
+  }
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+  .shell{max-width:1460px;margin:0 auto;padding:22px 22px 40px}
+
+  .masthead{border:1px solid var(--rule);background:var(--panel);border-radius:var(--r-lg);
+    box-shadow:var(--shadow);overflow:hidden;position:sticky;top:14px;z-index:30}
+  .masthead-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 18px}
+  .wordmark{display:flex;align-items:baseline;gap:9px;margin-right:auto}
+  .wordmark b{font-size:15px;font-weight:650;letter-spacing:-.015em}
+  .wordmark span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+
+  .brandswitch{display:flex;border:1px solid var(--rule);border-radius:999px;padding:3px;background:var(--panel-2)}
+  .brandswitch button{display:flex;align-items:center;gap:8px;border:0;background:transparent;
+    border-radius:999px;padding:6px 14px 6px 8px;font-size:12.5px;font-weight:600;color:var(--ink-3);transition:.16s}
+  .brandswitch button .chip{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;font-weight:800;color:#fff;letter-spacing:-.04em;flex:0 0 auto}
+  .brandswitch button[data-brand="portmix"] .chip{background:#C92A2F}
+  .brandswitch button[data-brand="helvetique"] .chip{background:#1c1a17}
+  .brandswitch button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(60,44,26,.14)}
+
+  .actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .lang{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-4)}
+
+  .btn{border:1px solid var(--rule);background:#fff;border-radius:10px;padding:8px 13px;
+    font-size:12.5px;font-weight:600;color:var(--ink-2);transition:.15s}
+  .btn:hover{border-color:var(--ink-4);color:var(--ink)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.12);color:#fff}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--ink-3)}
+  .btn.ghost:hover{background:var(--panel-2);color:var(--ink)}
+
+  input[type=text],input:not([type]),select{width:100%;border:1px solid var(--rule);background:#fff;
+    border-radius:10px;padding:9px 11px;font-size:13px;transition:.15s}
+  select{width:auto;padding:6px 9px;font-size:12px;border-radius:8px}
+  input:hover{border-color:var(--ink-4)}
+  input:focus,select:focus{outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+  input::placeholder{color:var(--ink-4)}
+
+  .layout{display:grid;grid-template-columns:minmax(0,388px) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+  @media(max-width:1060px){.layout{grid-template-columns:1fr}}
+
+  .panel{border:1px solid var(--rule);background:var(--panel);border-radius:var(--r-lg);
+    box-shadow:var(--shadow);overflow:hidden}
+  .panel-head{padding:16px 18px 13px;border-bottom:1px solid var(--rule-2);background:var(--panel-2)}
+  .panel-head h2{margin:3px 0 0;font-size:15.5px;font-weight:650;letter-spacing:-.012em}
+  .eyebrow{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+  .panel-body{padding:14px 18px 18px}
+
+  .group{margin-top:22px}
+  .group:first-child{margin-top:2px}
+  .group-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;
+    font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+  .group-title:after{content:"";flex:1;height:1px;background:var(--rule-2)}
+
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-2);margin-bottom:5px}
+  .field label small{font-weight:400;color:var(--ink-4)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .color-row{display:flex;gap:8px;align-items:center}
+  .color-row input[type=color]{width:40px;height:37px;padding:2px;border:1px solid var(--rule);
+    border-radius:9px;background:#fff;cursor:pointer;flex:0 0 auto}
+
+  .seg{display:flex;gap:3px;background:var(--panel-2);border:1px solid var(--rule-2);border-radius:11px;padding:3px}
+  .seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:7px 5px;
+    font-size:11.5px;font-weight:600;color:var(--ink-3);transition:.15s;white-space:nowrap}
+  .seg button:hover{color:var(--ink)}
+  .seg button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(60,44,26,.13)}
+
+  .toggle{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;
+    border-bottom:1px solid var(--rule-2)}
+  .toggle:last-child{border-bottom:0;padding-bottom:0}
+  .toggle strong{display:block;font-size:12.5px;font-weight:600}
+  .toggle span{display:block;font-size:11px;color:var(--ink-3);margin-top:1px}
+  .switch{position:relative;width:42px;height:24px;flex:0 0 auto}
+  .switch input{opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+  .slider{position:absolute;inset:0;background:#ddd3c5;border-radius:999px;transition:.18s;pointer-events:none}
+  .slider:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;
+    border-radius:50%;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.22)}
+  .switch input:checked+.slider{background:var(--accent)}
+  .switch input:checked+.slider:after{transform:translateX(18px)}
+  .switch input:focus-visible+.slider{outline:2px solid var(--accent);outline-offset:2px}
+
+  .stage-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:13px 18px;border-bottom:1px solid var(--rule-2);background:var(--panel-2)}
+  .stage-note{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .stage{background:repeating-linear-gradient(45deg,#ece4d8,#ece4d8 10px,#e9e0d2 10px,#e9e0d2 20px);
+    display:grid;place-items:start center;padding:24px;overflow:auto;min-height:400px}
+  .mail{background:#fff;border-radius:12px;border:1px solid #e0d5c6;box-shadow:0 16px 40px rgba(60,44,26,.14);
+    overflow:hidden;width:100%;transition:max-width .22s ease}
+  .mail-chrome{height:36px;border-bottom:1px solid #f1e8dc;display:flex;align-items:center;gap:6px;
+    padding:0 12px;background:#fdfaf6}
+  .dot{width:7px;height:7px;border-radius:50%;background:#dcd0c0}
+  .mail-body{padding:20px;color:#43403a;font:14px/1.55 Arial,sans-serif;background:#fff;min-height:260px}
+  .msg{margin-bottom:22px;color:#736a60}
+  .sig-stage{overflow-x:auto}
+
+  .meter{display:flex;align-items:center;gap:11px;padding:11px 18px;border-top:1px solid var(--rule-2);
+    background:var(--panel);font-size:11.5px;color:var(--ink-3);flex-wrap:wrap}
+  .meter .bar{flex:1;min-width:110px;height:5px;border-radius:999px;background:#e8dfd2;overflow:hidden}
+  .meter .bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s,background .25s}
+  .meter .status{font-weight:650;color:var(--ok)}
+  .meter.warn .bar i{background:var(--warn)} .meter.warn .status{color:var(--warn)}
+  .meter.bad .bar i{background:var(--bad)}  .meter.bad .status{color:var(--bad)}
+
+  .code{margin-top:16px;border:1px solid #2a2622;border-radius:var(--r-lg);background:#221f1c;
+    color:#efe6da;overflow:hidden;display:none}
+  .code.open{display:block}
+  .code-head{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;
+    border-bottom:1px solid rgba(255,255,255,.08);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:#c8bcab}
+  .code-head .btn{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);color:#efe6da;
+    letter-spacing:0;text-transform:none}
+  .code-head .btn:hover{color:#fff;border-color:rgba(255,255,255,.32)}
+  .code pre{margin:0;padding:15px;font:11.5px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
+    white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto}
+
+  .note{border:1px solid var(--rule);background:var(--panel-2);color:var(--ink-2);border-radius:12px;
+    padding:11px 13px;font-size:11px;line-height:1.65;margin-top:12px}
+  .note strong{color:var(--ink)}
+  .note.alert{border-color:#e8c5bf;background:#fdf2f0;color:#8a3d38}
+  .note.alert strong{color:#7a332e}
+
+  .install{margin-top:20px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  @media(max-width:880px){.grid3{grid-template-columns:1fr}}
+  .guide{border:1px solid var(--rule-2);background:#fff;border-radius:14px;padding:15px;position:relative}
+  .guide:before{content:"";position:absolute;left:15px;width:26px;top:0;height:2px;background:var(--accent)}
+  .guide .tag{display:inline-block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-3);font-weight:700}
+  .guide h3{margin:6px 0 8px;font-size:13.5px;font-weight:650}
+  .guide ol,.guide p{font-size:11.5px;line-height:1.7;color:var(--ink-3)}
+  .guide ol{padding-left:16px;margin:0}
+  .guide a{color:var(--accent);font-size:11.5px;font-weight:600;text-decoration:none}
+  .guide a:hover{text-decoration:underline}
+  .source{margin-top:13px;font-size:11px;line-height:1.7;color:var(--ink-4)}
+  .foot{text-align:center;font-size:10.5px;letter-spacing:.05em;color:var(--ink-4);padding:26px 0 4px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,18px);background:var(--ink);
+    color:#f8f3ec;padding:11px 18px;border-radius:11px;font-size:12.5px;
+    box-shadow:0 14px 34px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.22s;z-index:80;
+    max-width:min(520px,90vw);text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <div class="wordmark"><b>Signature Studio</b><span id="brandSubtitle"></span></div>
+      <div class="brandswitch" id="brandSwitch" role="group">
+        <button type="button" data-brand="portmix" class="active"><span class="chip">P</span>PortMix SA</button>
+        <button type="button" data-brand="helvetique"><span class="chip">H</span>Helvetique</button>
+      </div>
+      <div class="actions">
+        <div class="lang">
+          <label for="languageSelect" id="languageLabel">Jezik</label>
+          <select id="languageSelect">
+            <option value="bs">BS</option><option value="en">EN</option>
+            <option value="de">DE</option><option value="fr">FR</option>
+          </select>
+        </div>
+        <button class="btn ghost" id="resetBtn" type="button"></button>
+        <button class="btn" id="mobileTextBtn" type="button"></button>
+        <button class="btn" id="htmlBtn" type="button"></button>
+        <button class="btn" id="downloadBtn" type="button"></button>
+        <button class="btn primary" id="copyBtn" type="button"></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-head">
+        <div class="eyebrow" id="editorEyebrow"></div>
+        <h2 id="signatureDetailsTitle"></h2>
+      </div>
+      <div class="panel-body">
+        <div class="group">
+          <div class="group-title" id="identityTitle"></div>
+          <div class="field"><label for="fullName" id="fullNameLabel"></label><input id="fullName" value="Nasuf Biljibani" autocomplete="name"></div>
+          <div class="field"><label for="title" id="jobTitleLabel"></label><input id="title" value="Founder &amp; Managing Director"></div>
+          <div class="field"><label for="company" id="companyLabel"></label><input id="company" value="PortMix SA"></div>
+        </div>
+
+        <div class="group">
+          <div class="group-title" id="contactTitle"></div>
+          <div class="two">
+            <div class="field"><label for="phone" id="phoneLabel"></label><input id="phone" value="+41 21 611 12 14" inputmode="tel" placeholder="+41 ..."></div>
+            <div class="field"><label for="mobile" id="mobileLabel"></label><input id="mobile" value="" inputmode="tel" placeholder="+41 ..."></div>
+          </div>
+          <div class="field"><label for="email" id="emailLabel"></label><input id="email" value="info@portmix.ch" inputmode="email" placeholder="ime@firma.ch"></div>
+          <div class="field"><label for="website" id="websiteLabel"></label><input id="website" value="www.portmix.ch" inputmode="url" placeholder="www.firma.ch"></div>
+          <div class="field"><label for="address" id="addressLabel"></label><input id="address" value="Route des Toches 3, 1026 Echandens" placeholder="Ulica 1, 1200 Grad"></div>
+          <div class="field"><label for="mapUrl" id="mapUrlLabel"></label><input id="mapUrl" placeholder="https://maps.google.com/..."></div>
+        </div>
+
+        <div class="group">
+          <div class="group-title" id="formatTitle"></div>
+          <div class="field"><label id="sizeLabel"></label>
+            <div class="seg" id="sizeSeg">
+              <button type="button" data-size="compact" class="active"></button>
+              <button type="button" data-size="standard"></button>
+              <button type="button" data-size="large"></button>
+            </div>
+          </div>
+          <div class="field"><label id="layoutLabel"></label>
+            <div class="seg" id="layoutSeg">
+              <button type="button" data-layout="split" class="active"></button>
+              <button type="button" data-layout="stacked"></button>
+            </div>
+          </div>
+          <div class="field"><label id="iconModeLabel"></label>
+            <div class="seg" id="iconSeg">
+              <button type="button" data-icons="images" class="active"></button>
+              <button type="button" data-icons="labels"></button>
+              <button type="button" data-icons="none"></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="group-title" id="brandTitle"></div>
+          <div class="field"><label for="accent" id="accentLabel"></label>
+            <div class="color-row">
+              <input type="color" id="accentPicker" value="#ED1C24" aria-labelledby="accentLabel">
+              <input id="accent" value="#ED1C24" maxlength="7" spellcheck="false">
+            </div>
+          </div>
+          <div class="field"><label for="tagline" id="taglineLabel"></label><input id="tagline" value="SMART SOLUTIONS. STRONGER CONNECTIONS."></div>
+          <div class="field"><label for="logoUrl" id="logoUrlLabel"></label><input id="logoUrl" placeholder="https://.../signature-logo.png"></div>
+          <div class="note" id="logoNotice"></div>
+        </div>
+
+        <div class="group">
+          <div class="group-title" id="optionsTitle"></div>
+          <div class="toggle">
+            <div><strong id="showCompanyTitle"></strong><span id="showCompanyDesc"></span></div>
+            <label class="switch"><input id="showCompany" type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle">
+            <div><strong id="showLocationTitle"></strong><span id="showLocationDesc"></span></div>
+            <label class="switch"><input id="showLocation" type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle">
+            <div><strong id="showTaglineTitle"></strong><span id="showTaglineDesc"></span></div>
+            <label class="switch"><input id="showTagline" type="checkbox" checked><span class="slider"></span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <div class="stage-head">
+          <div>
+            <div class="eyebrow" id="livePreviewLabel"></div>
+            <div class="stage-note" id="modeStatus"></div>
+          </div>
+          <div class="seg" id="previewSeg" style="min-width:250px">
+            <button type="button" data-preview="640" class="active">Gmail 640</button>
+            <button type="button" data-preview="760">Outlook 760</button>
+            <button type="button" data-preview="380">Mobile 380</button>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="mail" id="mailWindow" style="max-width:640px">
+            <div class="mail-chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="mail-body">
+              <div class="msg" id="messageCopy"></div>
+              <div class="sig-stage" id="signaturePreview"></div>
+            </div>
+          </div>
+        </div>
+        <div class="meter" id="sizeMeter">
+          <span id="sizeMeterLabel"></span>
+          <span class="bar"><i id="sizeBar"></i></span>
+          <span class="status" id="sizeStatus"></span>
+        </div>
+      </div>
+
+      <div class="code" id="codePanel">
+        <div class="code-head">
+          <span id="generatedHtmlLabel"></span>
+          <button class="btn" type="button" id="copyCodeBtn"></button>
+        </div>
+        <pre id="htmlOutput"></pre>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel install" id="install">
+    <div class="panel-head">
+      <div class="eyebrow" id="installationEyebrow"></div>
+      <h2 id="installationTitle"></h2>
+      <div class="stage-note" id="guidanceNote"></div>
+    </div>
+    <div class="panel-body">
+      <div class="grid3" id="installGrid"></div>
+      <div class="note" id="deploymentNotice"></div>
+      <div class="note" id="bestPracticeNotice"></div>
+      <div class="source" id="sourceNote"></div>
+    </div>
+  </section>
+
+  <footer class="foot" id="footerText"></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+const ASSETS = {"logo": "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", "phone": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEXfFx8AAAD8+/vpVlv8AgL6q6vnZWn0b2/yqar21NexY2PkO0Puj5J/AADnamy0Hx8AAAAAAAAAAAAAAAAAAAAl/CvBAAAAEHRSTlP8AAvkAQyiA1RHA+iVAmIDlz/xUQAAASNJREFUeNqFUwkSwyAIFBA19/9/2xU10SRtmbHTyLosl6M/5rr/emweth36ClB/3fr4APBBlFZxMAkpY0YAwy2LaybJri4AEwc3WOAaxgD+4TcENwDHpx/Gm6+ASOuLHxyxAJSmol7TDUKzAWYuyhFyjLQUADIwgp3ipiNDArvDqcwKNhlVQJ7D2euXvycjJtK3Z0x6T6SmWQF7FfMVIPxAjCHwzZM8AU0kKCb0FC3dg/QizzRzpmhMfldDIbGuUFa7ZLOFHtRC5TrgJ/QdKgNicLy1Zvlp6YoTlDkZ50qxpDnf2i1VAc/+18CgLPHXyCFnvYY2el7f/efYb5RkGLfmORcHJ5k8EVk5K7+vXlbEUza4D35d3rZukd+3Gwysquz7qw8A9gZk8A1toQAAAABJRU5ErkJggg==", "mail": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADgGSH5/ProU1j2a2v/AADuoqbnYmjfYGP4qav12NfpPEPvjpK6MjKvX19/AAAAAAAAAAAAAAAAAAAAAABG7PKvAAAAEHRSTlMA/AzmAwFYoWQDVPScAwMCp5OKuAAAASNJREFUeNp9U1u2wyAIREB8ptn/bi+KSTS1d077E3AYBgCY4DExpwQ/gHwn7nLw0H+WGCV3rq+4/ipRcc4RVc35rHFuYXeDKgIv8RODW0ACkxCvFdwb8nAgv993jrnKJt4y2Pdoglx2Ca4Oig92/bRgFMHuAHYC7QxvwKJTrCTd7mEwTwL47lG0xolEhauDQkXs2zDBCrZ3NBzP9sgNxluRlCKZXFCiTUIT1PpRk6+ybswpXPVUUtCuGF8J8fINTbVPKU0ik7VJ6/yjtclmVBeRH5tyzmRG9ZEz1k4xjWlYPdYKPdJ2WOL52jfZjTM8+3B1tcZ1j+CfjGA9PxlC7/iy1nDorMq80/A+HeVDscOp0h58395U0u8PmI/TK87j533v8AfsiwcP67QWtwAAAABJRU5ErkJggg==", "web": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADiGSH89/jmVlvmYWX1pabwnaDwnaL53N3/AAD+amrlO0Toa3B/AADjLzOxY2MAAAAAAAAAAAAAAAAAAACm4tS4AAAAEHRSTlMA+hLkpBlYnEoBBuNnAq0DcPoEMgAAAV1JREFUeNp9U4uSgyAMDHkiIP3/v70E0KptLzPOYLLZvAHuggi/RWDfALbdH1/N25thKx/m0CtQrSkRa2A+IErpFGrT5ZQCyOkmjNcwuD3tKYXytO+nvRLV9ey4H3kUhIM3nLDR+ltBXpCHF6GaEjTRRRi5TcD0cLUyUULq2KfHKEUWQbhhcoCym4ZKB4V/I6KNzwGk/tKhG+3aYEREseZsCmYIJhhhaVUx3q7pHoVb6tkVAjPNE8A5WJzf6cATcOADEB6SJsAV8ARQMMBkEFe0a4jx9swUtYgIoLTpVdceWQAaAqt2tg7KnOVd5mpUxdEBDwErytGoo9XsiNHJDGkOo85WO0DX9DiGxcbY0jVFeK3pkTtgxpzn8HxWx0KcC0NkBmtj3C7/rRzl63mU/Ym428da23XtfaLl43DQwIuMvbUctX05La9BNedYkm83jGU/Asqv+0b0YeHtLP8APjkIe//1vPUAAAAASUVORK5CYII=", "location": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADgGCD7+fnoUFX7AwP4bGzumJvmY2r0pKXmOkL319axZGTkbG7ujY9/AAC0Hx8AAAAAAAAAAAAAAAAAAADLQ/x8AAAAEHRSTlMA/A/fAQVSoxLvRANilgIDmqjdDAAAAS1JREFUeNp1U4uyhSAIRMBnVv//t5dCKL0dZpwRWRaUFeBljCXGUuCHYXTgFwZPWS31ntrNtcYlG3eiGkIg2gWzrXEJBzfaEeLED5jDZNTg1UiBRmExSg8HM1i8kiOpOCIaPyVpHtPAEB6K2CDZiXWkfgYeAE2pd3pH6XhwyE47rJqAHEnrFAXczyOrq1ssE3BstEaEbB2gIhOMojRuQQ6gQWXXngAhRewzcgFcFWVeGQ+79wIIEpH+nq4GQBq1x8VNHI5OQGPS5oeuD4c1WNGoo7aDoPPxeSUTi2uB8CyPMuqQVeHmFBmegkKwGcXuh3vzbcbN9f4SHD3xg11S/yR5TWySPmOvU/ya/SRrhkT1rVhYv47Ua10/DiT1FyuvI/7+wOU8WOw4f/7vL/sD8wUHHo+RExsAAAAASUVORK5CYII=", "logoHelvetique": "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"};
+const I18N = {"bs": {"docTitle": "Signature Studio", "brandSubtitle": "Profesionalan, čist i jednostavan generator poslovnih potpisa", "language": "Jezik", "reset": "Vrati početno", "copyMobile": "Kopiraj mobilni tekst", "viewHtml": "Prikaži HTML", "hideHtml": "Sakrij HTML", "copySignature": "Kopiraj potpis", "downloadHtml": "Preuzmi HTML", "editor": "Uređivanje", "signatureDetails": "Podaci potpisa", "identity": "Identitet", "fullName": "Ime i prezime", "jobTitle": "Pozicija", "company": "Kompanija", "contact": "Kontakt", "phone": "Telefon", "email": "E-mail", "website": "Web stranica", "address": "Lokacija / adresa", "mapLink": "Link mape <small>opcionalno</small>", "brand": "Brend", "accent": "Akcentna boja", "tagline": "Donja linija / slogan", "logoUrl": "URL hostovanog logotipa <small>preporučeno</small>", "options": "Opcije", "showCompany": "Prikaži kompaniju", "showCompanyDesc": "Prikazuje “PortMix SA” ispod pozicije.", "showLocation": "Prikaži lokaciju", "showLocationDesc": "Korisno za lokalnu komunikaciju sa klijentima.", "showTagline": "Prikaži slogan", "showTaglineDesc": "Dodaje tanku donju liniju iz odobrenog dizajna.", "livePreview": "Pregled uživo", "desktopPreview": "Pregled e-maila na računaru", "phonePreview": "Pregled širine telefona", "desktop": "Računar", "phoneBtn": "Telefon", "message": "Poštovani,<br><br>Hvala na poruci. Moje kontakt podatke možete pronaći ispod.<br><br>Srdačan pozdrav,", "generatedHtml": "Generisani HTML prilagođen e-mail klijentima", "copyCode": "Kopiraj kod", "installation": "Instalacija", "installationTitle": "Kako instalirati generisani potpis", "guidance": "Upute provjerene prema zvaničnoj dokumentaciji podrške • august 2026.", "deployment": "<strong>Preporučeno postavljanje:</strong> uploadujte <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> i četiri PNG ikonice u isti HTTPS folder kao ovaj generator (npr. <b>/signature/</b>). Generator ih tada automatski koristi umjesto ugrađenog base64 koda, pa potpis ostaje mali i brzo se učitava.", "bestPractice": "<strong>Preporuka:</strong> nakon instalacije pošaljite testni e-mail iz Outlooka, Gmaila i sa telefona na Gmail i Outlook adresu. Provjerite učitavanje logotipa, linkove, razmake i izgled odgovora. Neki primaoci ili kompanijske sigurnosne postavke blokiraju automatsko učitavanje vanjskih slika; to je postavka e-mail klijenta, a ne greška potpisa.", "source": "Potpis koristi prezentacijske tabele, inline CSS, web-sigurne fontove, fiksne širine kolona, mso-line-height-rule za Outlook i dodatno stilizovane linkove. Prazna polja se automatski izostavljaju iz rasporeda. JavaScript se koristi samo u generatoru, nikad u samom potpisu.", "footer": "Signature Studio · Samostalni HTML generator · Uređivanje i generisanje se odvijaju lokalno u pregledniku.", "logoHosted": "<strong>Hostovani logo:</strong> potpis koristi vaš javni HTTPS URL — najbolje za Gmail i Outlook.", "logoPackage": "<strong>Logo iz paketa:</strong> generator koristi <b>portmix-signature-logo.png</b> iz istog foldera. Ovo je najlakši i najlakši za održavanje način.", "logoOffline": "<strong>Offline logo:</strong> logo je ugrađen kao base64 da generator radi lokalno. Ovo povećava veličinu koda — za produkciju uploadujte PNG fajlove na HTTPS folder ili unesite URL logotipa iznad.", "toastSignature": "Potpis je kopiran — zalijepite ga u svoj e-mail klijent.", "toastBlocked": "Preglednik je blokirao automatsko kopiranje. Otvorite “Prikaži HTML” ili ručno označite pregled potpisa.", "toastMobile": "Mobilna tekstualna verzija je kopirana.", "toastCode": "HTML kod je kopiran.", "toastDownloaded": "HTML potpisa je preuzet.", "toastReset": "Početne vrijednosti su vraćene.", "emailSignatureTitle": "E-mail potpis", "defaultTitle": "Osnivač i direktor", "defaultTagline": "PAMETNA RJEŠENJA. SNAŽNIJE VEZE.", "guides": [{"tag": "Gmail · Web", "title": "Puni vizualni potpis", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b> iznad.</li><li>U Gmailu otvorite <b>Postavke → Prikaži sve postavke</b>.</li><li>U dijelu <b>Općenito → Potpis</b> kreirajte novi potpis.</li><li>Kliknite u editor potpisa i zalijepite sadržaj.</li><li>Odaberite zadani potpis za nove poruke i odgovore/prosljeđivanja.</li><li>Na dnu kliknite <b>Sačuvaj promjene</b>.</li></ol>", "link": "Zvanične Gmail upute ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Novi / Web", "title": "Preporučeno Microsoft podešavanje", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite Outlook <b>Postavke → Računi → Potpisi</b>.</li><li>Odaberite odgovarajući račun i kliknite <b>Dodaj potpis</b>.</li><li>Zalijepite potpis u editor.</li><li>Odaberite da li se koristi za nove poruke i odgovore/prosljeđivanja.</li><li>Kliknite <b>Sačuvaj</b>.</li></ol>", "link": "Zvanične Outlook upute ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Klasični desktop Outlook", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite <b>Novi e-mail → Poruka → Potpis → Potpisi</b>.</li><li>Odaberite <b>Novi</b>, dodijelite naziv potpisu i zalijepite ga u <b>Uredi potpis</b>.</li><li>Odaberite zadani potpis za nove poruke i, po želji, odgovore/prosljeđivanja.</li><li>Sačuvajte klikom na <b>OK</b>.</li></ol><p>Microsoft podržava kopirane predloške, tabele, linkove i slike u klasičnim Outlook potpisima.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Zadržite desktop potpis", "html": "<p>Ako u Gmail mobilnoj aplikaciji <b>ne napravite Mobile Signature</b>, nove poruke koriste potpis podešen na računaru.</p><ol><li>Prvo instalirajte puni potpis u Gmailu na webu.</li><li>U Gmail aplikaciji ostavite <b>Mobile Signature</b> nepodešen/isključen.</li><li>Pošaljite testnu poruku sa telefona.</li></ol>", "link": "Zvanične Gmail mobilne upute ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobilna zamjenska verzija", "html": "<p>Outlook mobilna aplikacija ima polje za potpis po računu u <b>Postavke → Mail → Potpis</b>. Za siguran rezultat koristite dugme <b>Kopiraj mobilni tekst</b>.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>U Outlook aplikaciji otvorite <b>Postavke → Mail → Potpis</b>.</li><li>Po potrebi uključite <b>Potpis po računu</b>.</li><li>Zalijepite tekst i sačuvajte.</li></ol>", "link": "Zvanične Outlook mobilne upute ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Tekstualna verzija za Apple Mail", "html": "<p>Appleova iPhone dokumentacija navodi da su potpisi u Mail postavkama <b>samo tekstualni</b>. Koristite mobilnu tekstualnu verziju umjesto punog vizualnog potpisa.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>Otvorite <b>Postavke → Aplikacije → Mail → Potpis</b>.</li><li>Po potrebi odaberite <b>Po računu</b>.</li><li>Zalijepite tekstualni potpis.</li></ol>", "link": "Zvanične Apple upute ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobitel <small>opcionalno</small>", "format": "Format potpisa", "size": "Veličina", "sizeCompact": "Kompaktna", "sizeStandard": "Standardna", "sizeLarge": "Velika", "layout": "Raspored", "layoutSplit": "Logo lijevo", "layoutStacked": "Logo iznad", "iconMode": "Ikone", "iconImages": "Slike", "iconLabels": "Oznake (T/E/W)", "iconNone": "Bez ikona", "sizeMeter": "Veličina koda: {n} znakova", "sizeOk": "Prolazi kroz Gmail", "sizeNear": "Blizu Gmail limita", "sizeOver": "Prelazi Gmail limit (10.000)", "previewNote": "Pregled prikazuje stvarnu širinu e-mail prozora", "studioTag": "PortMix · Helvetique", "toastBrand": "Profil firme: {n}"}, "en": {"docTitle": "Signature Studio", "brandSubtitle": "Professional, clean and client-friendly signature builder", "language": "Language", "reset": "Reset", "copyMobile": "Copy mobile text", "viewHtml": "View HTML", "hideHtml": "Hide HTML", "copySignature": "Copy signature", "downloadHtml": "Download HTML", "editor": "Editor", "signatureDetails": "Signature details", "identity": "Identity", "fullName": "Full name", "jobTitle": "Job title", "company": "Company", "contact": "Contact", "phone": "Phone", "email": "Email", "website": "Website", "address": "Location / address", "mapLink": "Map link <small>optional</small>", "brand": "Brand", "accent": "Accent color", "tagline": "Bottom line / slogan", "logoUrl": "Hosted logo URL <small>recommended</small>", "options": "Options", "showCompany": "Show company line", "showCompanyDesc": "Displays “PortMix SA” under the job title.", "showLocation": "Show location", "showLocationDesc": "Useful for local client communication.", "showTagline": "Show tagline", "showTaglineDesc": "Creates the thin footer line from the approved concept.", "livePreview": "Live preview", "desktopPreview": "Desktop email preview", "phonePreview": "Phone-width preview", "desktop": "Desktop", "phoneBtn": "Phone", "message": "Hello,<br><br>Thank you for your message. You can find my contact details below.<br><br>Kind regards,", "generatedHtml": "Generated email-safe HTML", "copyCode": "Copy code", "installation": "Installation", "installationTitle": "How to install the generated signature", "guidance": "Guidance verified against official support documentation • Aug 2026", "deployment": "<strong>Recommended deployment:</strong> upload <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> and the four PNG icons into the same HTTPS folder as this generator (for example <b>/signature/</b>). The generator then links to them instead of embedding base64, keeping the signature small and fast to load.", "bestPractice": "<strong>Best practice:</strong> after installing, send test emails from Outlook, Gmail and the phone to both a Gmail inbox and an Outlook inbox. Check logo loading, links, spacing and reply behaviour. Some recipients or corporate policies block automatic external image downloads; that is a mail-client security setting, not a broken signature.", "source": "The signature uses presentation tables, inline CSS, web-safe fonts, fixed column widths, mso-line-height-rule for Outlook and link-safe inline styling. Empty fields are dropped from the layout automatically. JavaScript is used only by the generator, never inside the signature.", "footer": "Signature Studio · Standalone HTML generator · All editing and generation happens locally in the browser.", "logoHosted": "<strong>Hosted logo:</strong> the signature uses your public HTTPS URL — best for Gmail and Outlook.", "logoPackage": "<strong>Package logo:</strong> the generator uses <b>portmix-signature-logo.png</b> from this same folder. This is the easiest setup to maintain.", "logoOffline": "<strong>Offline logo:</strong> the logo is embedded as base64 so the generator works locally. This inflates the code size — for production, upload the PNG files to an HTTPS folder or paste a hosted logo URL above.", "toastSignature": "Signature copied — paste it into your email client.", "toastBlocked": "Browser blocked automatic copy. Use “View HTML” or select the preview manually.", "toastMobile": "Mobile text signature copied.", "toastCode": "HTML source copied.", "toastDownloaded": "Signature HTML downloaded.", "toastReset": "Defaults restored.", "emailSignatureTitle": "Email Signature", "defaultTitle": "Founder & Managing Director", "defaultTagline": "SMART SOLUTIONS. STRONGER CONNECTIONS.", "guides": [{"tag": "Gmail · Web", "title": "Full visual signature", "html": "<ol><li>Click <b>Copy signature</b> above.</li><li>In Gmail open <b>Settings → See all settings</b>.</li><li>Under <b>General → Signature</b>, create a new signature.</li><li>Click inside the signature editor and paste.</li><li>Choose defaults for new emails and replies/forwards.</li><li>Scroll down and click <b>Save Changes</b>.</li></ol>", "link": "Official Gmail instructions ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · New / Web", "title": "Recommended Microsoft setup", "html": "<ol><li>Click <b>Copy signature</b>.</li><li>Open Outlook <b>Settings → Accounts → Signatures</b>.</li><li>Select the correct account and choose <b>Add signature</b>.</li><li>Paste into the signature editor.</li><li>Choose whether it applies to new messages and replies/forwards.</li><li>Click <b>Save</b>.</li></ol>", "link": "Official Outlook instructions ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Classic desktop Outlook", "html": "<ol><li>Click <b>Copy signature</b>.</li><li>Open <b>New Email → Message → Signature → Signatures</b>.</li><li>Choose <b>New</b>, name the signature, then paste it in <b>Edit signature</b>.</li><li>Select the default signature for new messages and, if desired, replies/forwards.</li><li>Save with <b>OK</b>.</li></ol><p>Microsoft supports copied templates, tables, links and images in classic Outlook signatures.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Keep the desktop signature", "html": "<p>If you <b>do not create a Mobile Signature</b> in the Gmail app, new messages use the signature configured on the computer.</p><ol><li>Install the full signature in Gmail on the web first.</li><li>In the Gmail mobile app, leave <b>Mobile Signature</b> unset/off.</li><li>Send a test message from the phone.</li></ol>", "link": "Official Gmail mobile instructions ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobile fallback", "html": "<p>Outlook mobile provides a per-account signature field under <b>Settings → Mail → Signature</b>. For a dependable result, use the generator's <b>Copy mobile text</b> button.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>In Outlook mobile open <b>Settings → Mail → Signature</b>.</li><li>Enable <b>Per Account Signature</b> if needed.</li><li>Paste and save.</li></ol>", "link": "Official Outlook mobile instructions ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Text-only Apple Mail version", "html": "<p>Apple's current iPhone documentation says Mail signatures in Settings are <b>text only</b>. Use the generator's mobile text version instead of the full visual layout.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>Open <b>Settings → Apps → Mail → Signature</b>.</li><li>Choose <b>Per Account</b> if needed.</li><li>Paste the text signature.</li></ol>", "link": "Official Apple instructions ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobile <small>optional</small>", "format": "Signature format", "size": "Size", "sizeCompact": "Compact", "sizeStandard": "Standard", "sizeLarge": "Large", "layout": "Layout", "layoutSplit": "Logo left", "layoutStacked": "Logo on top", "iconMode": "Icons", "iconImages": "Images", "iconLabels": "Labels (T/E/W)", "iconNone": "No icons", "sizeMeter": "Code size: {n} characters", "sizeOk": "Fits Gmail", "sizeNear": "Close to Gmail limit", "sizeOver": "Over Gmail limit (10,000)", "previewNote": "Preview shows a real email window width", "studioTag": "PortMix · Helvetique", "toastBrand": "Company profile: {n}"}, "de": {"docTitle": "Signature Studio", "brandSubtitle": "Professioneller, klarer und kundenfreundlicher Signatur-Generator", "language": "Sprache", "reset": "Zurücksetzen", "copyMobile": "Mobiltext kopieren", "viewHtml": "HTML anzeigen", "hideHtml": "HTML ausblenden", "copySignature": "Signatur kopieren", "downloadHtml": "HTML herunterladen", "editor": "Editor", "signatureDetails": "Signaturdaten", "identity": "Identität", "fullName": "Vor- und Nachname", "jobTitle": "Position", "company": "Unternehmen", "contact": "Kontakt", "phone": "Telefon", "email": "E-Mail", "website": "Webseite", "address": "Standort / Adresse", "mapLink": "Kartenlink <small>optional</small>", "brand": "Marke", "accent": "Akzentfarbe", "tagline": "Unterzeile / Slogan", "logoUrl": "URL des gehosteten Logos <small>empfohlen</small>", "options": "Optionen", "showCompany": "Unternehmenszeile anzeigen", "showCompanyDesc": "Zeigt „PortMix SA“ unter der Position an.", "showLocation": "Standort anzeigen", "showLocationDesc": "Nützlich für die lokale Kundenkommunikation.", "showTagline": "Slogan anzeigen", "showTaglineDesc": "Fügt die feine Abschlusslinie aus dem freigegebenen Entwurf hinzu.", "livePreview": "Live-Vorschau", "desktopPreview": "E-Mail-Vorschau am Desktop", "phonePreview": "Vorschau in Smartphone-Breite", "desktop": "Desktop", "phoneBtn": "Smartphone", "message": "Guten Tag,<br><br>vielen Dank für Ihre Nachricht. Meine Kontaktdaten finden Sie unten.<br><br>Freundliche Grüße,", "generatedHtml": "Generiertes, E-Mail-kompatibles HTML", "copyCode": "Code kopieren", "installation": "Installation", "installationTitle": "So installieren Sie die generierte Signatur", "guidance": "Anleitung anhand offizieller Support-Dokumentation geprüft • August 2026", "deployment": "<strong>Empfohlene Bereitstellung:</strong> Laden Sie <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> und die vier PNG-Symbole in denselben HTTPS-Ordner wie diesen Generator hoch (z. B. <b>/signature/</b>). Der Generator verlinkt sie dann, statt base64 einzubetten — die Signatur bleibt klein und lädt schnell.", "bestPractice": "<strong>Empfehlung:</strong> Senden Sie nach der Installation Test-E-Mails aus Outlook, Gmail und vom Smartphone an ein Gmail- und ein Outlook-Postfach. Prüfen Sie Logo, Links, Abstände und das Verhalten bei Antworten. Manche Empfänger oder Unternehmensrichtlinien blockieren externe Bilder automatisch; das ist eine Sicherheitseinstellung des E-Mail-Clients und kein Fehler der Signatur.", "source": "Die Signatur verwendet Präsentationstabellen, Inline-CSS, websichere Schriften, feste Spaltenbreiten, mso-line-height-rule für Outlook und link-sichere Inline-Stile. Leere Felder werden automatisch aus dem Layout entfernt. JavaScript wird nur im Generator verwendet, nie in der Signatur.", "footer": "Signature Studio · Eigenständiger HTML-Generator · Bearbeitung und Generierung erfolgen lokal im Browser.", "logoHosted": "<strong>Gehostetes Logo:</strong> Die Signatur nutzt Ihre öffentliche HTTPS-URL — am besten für Gmail und Outlook.", "logoPackage": "<strong>Logo aus dem Paket:</strong> Der Generator verwendet <b>portmix-signature-logo.png</b> aus demselben Ordner. Das ist die einfachste Variante.", "logoOffline": "<strong>Offline-Logo:</strong> Das Logo ist als base64 eingebettet, damit der Generator lokal funktioniert. Das vergrößert den Code — laden Sie für den Produktivbetrieb die PNG-Dateien in einen HTTPS-Ordner hoch oder tragen Sie oben eine Logo-URL ein.", "toastSignature": "Signatur kopiert — fügen Sie sie in Ihren E-Mail-Client ein.", "toastBlocked": "Der Browser hat das automatische Kopieren blockiert. Verwenden Sie „HTML anzeigen“ oder markieren Sie die Vorschau manuell.", "toastMobile": "Mobile Textsignatur kopiert.", "toastCode": "HTML-Code kopiert.", "toastDownloaded": "Signatur-HTML heruntergeladen.", "toastReset": "Standardwerte wiederhergestellt.", "emailSignatureTitle": "E-Mail-Signatur", "defaultTitle": "Gründer & Geschäftsführer", "defaultTagline": "INTELLIGENTE LÖSUNGEN. STÄRKERE VERBINDUNGEN.", "guides": [{"tag": "Gmail · Web", "title": "Vollständige visuelle Signatur", "html": "<ol><li>Klicken Sie oben auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie in Gmail <b>Einstellungen → Alle Einstellungen aufrufen</b>.</li><li>Erstellen Sie unter <b>Allgemein → Signatur</b> eine neue Signatur.</li><li>Klicken Sie in den Signatur-Editor und fügen Sie den Inhalt ein.</li><li>Legen Sie die Standards für neue E-Mails sowie Antworten/Weiterleitungen fest.</li><li>Scrollen Sie nach unten und klicken Sie auf <b>Änderungen speichern</b>.</li></ol>", "link": "Offizielle Gmail-Anleitung ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Neu / Web", "title": "Empfohlene Microsoft-Einrichtung", "html": "<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie Outlook <b>Einstellungen → Konten → Signaturen</b>.</li><li>Wählen Sie das richtige Konto und <b>Signatur hinzufügen</b>.</li><li>Fügen Sie die Signatur in den Editor ein.</li><li>Wählen Sie, ob sie für neue Nachrichten und Antworten/Weiterleitungen verwendet werden soll.</li><li>Klicken Sie auf <b>Speichern</b>.</li></ol>", "link": "Offizielle Outlook-Anleitung ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Klassisches Outlook für Windows", "html": "<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie <b>Neue E-Mail → Nachricht → Signatur → Signaturen</b>.</li><li>Wählen Sie <b>Neu</b>, benennen Sie die Signatur und fügen Sie sie unter <b>Signatur bearbeiten</b> ein.</li><li>Wählen Sie die Standardsignatur für neue Nachrichten und optional für Antworten/Weiterleitungen.</li><li>Speichern Sie mit <b>OK</b>.</li></ol><p>Microsoft unterstützt kopierte Vorlagen, Tabellen, Links und Bilder in klassischen Outlook-Signaturen.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Desktop-Signatur beibehalten", "html": "<p>Wenn Sie in der Gmail-App <b>keine mobile Signatur</b> erstellen, verwenden neue Nachrichten die am Computer eingerichtete Signatur.</p><ol><li>Installieren Sie zuerst die vollständige Signatur in Gmail im Web.</li><li>Lassen Sie <b>Mobile Signatur</b> in der Gmail-App leer/deaktiviert.</li><li>Senden Sie eine Testnachricht vom Smartphone.</li></ol>", "link": "Offizielle Gmail-Mobilanleitung ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobile Ersatzversion", "html": "<p>Outlook Mobile bietet pro Konto ein Signaturfeld unter <b>Einstellungen → Mail → Signatur</b>. Für ein zuverlässiges Ergebnis verwenden Sie <b>Mobiltext kopieren</b>.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie in Outlook Mobile <b>Einstellungen → Mail → Signatur</b>.</li><li>Aktivieren Sie bei Bedarf <b>Signatur pro Konto</b>.</li><li>Fügen Sie den Text ein und speichern Sie.</li></ol>", "link": "Offizielle Outlook-Mobilanleitung ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Textversion für Apple Mail", "html": "<p>Laut aktueller iPhone-Dokumentation von Apple sind Mail-Signaturen in den Einstellungen <b>nur Text</b>. Verwenden Sie daher die mobile Textversion.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie <b>Einstellungen → Apps → Mail → Signatur</b>.</li><li>Wählen Sie bei Bedarf <b>Pro Account</b>.</li><li>Fügen Sie die Textsignatur ein.</li></ol>", "link": "Offizielle Apple-Anleitung ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobil <small>optional</small>", "format": "Signaturformat", "size": "Größe", "sizeCompact": "Kompakt", "sizeStandard": "Standard", "sizeLarge": "Groß", "layout": "Layout", "layoutSplit": "Logo links", "layoutStacked": "Logo oben", "iconMode": "Symbole", "iconImages": "Bilder", "iconLabels": "Kürzel (T/E/W)", "iconNone": "Ohne Symbole", "sizeMeter": "Codegröße: {n} Zeichen", "sizeOk": "Passt in Gmail", "sizeNear": "Nahe am Gmail-Limit", "sizeOver": "Über Gmail-Limit (10.000)", "previewNote": "Die Vorschau zeigt eine reale E-Mail-Fensterbreite", "studioTag": "PortMix · Helvetique", "toastBrand": "Firmenprofil: {n}"}, "fr": {"docTitle": "Signature Studio", "brandSubtitle": "Générateur de signature professionnel, épuré et simple pour le client", "language": "Langue", "reset": "Réinitialiser", "copyMobile": "Copier le texte mobile", "viewHtml": "Afficher le HTML", "hideHtml": "Masquer le HTML", "copySignature": "Copier la signature", "downloadHtml": "Télécharger le HTML", "editor": "Éditeur", "signatureDetails": "Détails de la signature", "identity": "Identité", "fullName": "Nom et prénom", "jobTitle": "Fonction", "company": "Entreprise", "contact": "Contact", "phone": "Téléphone", "email": "E-mail", "website": "Site web", "address": "Lieu / adresse", "mapLink": "Lien de carte <small>facultatif</small>", "brand": "Marque", "accent": "Couleur d’accent", "tagline": "Ligne inférieure / slogan", "logoUrl": "URL du logo hébergé <small>recommandé</small>", "options": "Options", "showCompany": "Afficher l’entreprise", "showCompanyDesc": "Affiche « PortMix SA » sous la fonction.", "showLocation": "Afficher le lieu", "showLocationDesc": "Utile pour la communication avec les clients locaux.", "showTagline": "Afficher le slogan", "showTaglineDesc": "Ajoute la fine ligne de bas de page du concept approuvé.", "livePreview": "Aperçu en direct", "desktopPreview": "Aperçu e-mail sur ordinateur", "phonePreview": "Aperçu largeur téléphone", "desktop": "Ordinateur", "phoneBtn": "Téléphone", "message": "Bonjour,<br><br>Merci pour votre message. Vous trouverez mes coordonnées ci-dessous.<br><br>Cordialement,", "generatedHtml": "HTML généré compatible avec les clients e-mail", "copyCode": "Copier le code", "installation": "Installation", "installationTitle": "Comment installer la signature générée", "guidance": "Instructions vérifiées à partir de la documentation officielle • août 2026", "deployment": "<strong>Déploiement recommandé :</strong> téléversez <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> et les quatre icônes PNG dans le même dossier HTTPS que ce générateur (par exemple <b>/signature/</b>). Le générateur y fera référence au lieu d'intégrer du base64, ce qui garde la signature légère et rapide à charger.", "bestPractice": "<strong>Bonne pratique :</strong> après l'installation, envoyez des e-mails de test depuis Outlook, Gmail et le téléphone vers une boîte Gmail et une boîte Outlook. Vérifiez le chargement du logo, les liens, les espacements et le comportement lors des réponses. Certains destinataires ou politiques d'entreprise bloquent le chargement automatique des images externes ; il s'agit d'un réglage de sécurité du client e-mail, pas d'une erreur de signature.", "source": "La signature utilise des tableaux de présentation, du CSS en ligne, des polices web sûres, des largeurs de colonnes fixes, mso-line-height-rule pour Outlook et des liens stylés en ligne. Les champs vides sont automatiquement retirés de la mise en page. JavaScript est utilisé uniquement dans le générateur, jamais dans la signature.", "footer": "Signature Studio · Générateur HTML autonome · Toute l'édition et la génération se font localement dans le navigateur.", "logoHosted": "<strong>Logo hébergé :</strong> la signature utilise votre URL HTTPS publique — idéal pour Gmail et Outlook.", "logoPackage": "<strong>Logo du package :</strong> le générateur utilise <b>portmix-signature-logo.png</b> depuis ce même dossier. C'est la configuration la plus simple à maintenir.", "logoOffline": "<strong>Logo hors ligne :</strong> le logo est intégré en base64 pour que le générateur fonctionne localement. Cela alourdit le code — en production, téléversez les fichiers PNG dans un dossier HTTPS ou saisissez une URL de logo ci-dessus.", "toastSignature": "Signature copiée — collez-la dans votre client e-mail.", "toastBlocked": "Le navigateur a bloqué la copie automatique. Utilisez « Afficher le HTML » ou sélectionnez manuellement l’aperçu.", "toastMobile": "Version texte mobile copiée.", "toastCode": "Code HTML copié.", "toastDownloaded": "HTML de la signature téléchargé.", "toastReset": "Valeurs par défaut restaurées.", "emailSignatureTitle": "Signature e-mail", "defaultTitle": "Fondateur & Directeur général", "defaultTagline": "SOLUTIONS INTELLIGENTES. DES CONNEXIONS PLUS FORTES.", "guides": [{"tag": "Gmail · Web", "title": "Signature visuelle complète", "html": "<ol><li>Cliquez sur <b>Copier la signature</b> ci-dessus.</li><li>Dans Gmail, ouvrez <b>Paramètres → Voir tous les paramètres</b>.</li><li>Dans <b>Général → Signature</b>, créez une nouvelle signature.</li><li>Cliquez dans l’éditeur de signature et collez le contenu.</li><li>Choisissez les valeurs par défaut pour les nouveaux e-mails et les réponses/transferts.</li><li>En bas de la page, cliquez sur <b>Enregistrer les modifications</b>.</li></ol>", "link": "Instructions officielles Gmail ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Nouveau / Web", "title": "Configuration Microsoft recommandée", "html": "<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez Outlook <b>Paramètres → Comptes → Signatures</b>.</li><li>Sélectionnez le bon compte puis <b>Ajouter une signature</b>.</li><li>Collez la signature dans l’éditeur.</li><li>Choisissez si elle doit être utilisée pour les nouveaux messages et les réponses/transferts.</li><li>Cliquez sur <b>Enregistrer</b>.</li></ol>", "link": "Instructions officielles Outlook ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Outlook classique pour Windows", "html": "<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez <b>Nouveau message → Message → Signature → Signatures</b>.</li><li>Choisissez <b>Nouveau</b>, nommez la signature puis collez-la dans <b>Modifier la signature</b>.</li><li>Sélectionnez la signature par défaut pour les nouveaux messages et, si souhaité, les réponses/transferts.</li><li>Enregistrez avec <b>OK</b>.</li></ol><p>Microsoft prend en charge les modèles copiés, tableaux, liens et images dans les signatures Outlook classiques.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Conserver la signature du bureau", "html": "<p>Si vous <b>ne créez pas de signature mobile</b> dans l’application Gmail, les nouveaux messages utilisent la signature configurée sur l’ordinateur.</p><ol><li>Installez d’abord la signature complète dans Gmail sur le web.</li><li>Dans l’application Gmail, laissez <b>Signature mobile</b> non définie/désactivée.</li><li>Envoyez un message de test depuis le téléphone.</li></ol>", "link": "Instructions mobiles officielles Gmail ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Version mobile de secours", "html": "<p>Outlook mobile propose un champ de signature par compte dans <b>Paramètres → Mail → Signature</b>. Pour un résultat fiable, utilisez le bouton <b>Copier le texte mobile</b>.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Dans Outlook mobile, ouvrez <b>Paramètres → Mail → Signature</b>.</li><li>Activez si nécessaire <b>Signature par compte</b>.</li><li>Collez le texte et enregistrez.</li></ol>", "link": "Instructions mobiles officielles Outlook ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Version texte pour Apple Mail", "html": "<p>La documentation iPhone actuelle d’Apple indique que les signatures Mail dans Réglages sont <b>uniquement du texte</b>. Utilisez donc la version texte mobile.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Ouvrez <b>Réglages → Apps → Mail → Signature</b>.</li><li>Choisissez <b>Par compte</b> si nécessaire.</li><li>Collez la signature texte.</li></ol>", "link": "Instructions officielles Apple ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobile <small>facultatif</small>", "format": "Format de signature", "size": "Taille", "sizeCompact": "Compacte", "sizeStandard": "Standard", "sizeLarge": "Grande", "layout": "Disposition", "layoutSplit": "Logo à gauche", "layoutStacked": "Logo en haut", "iconMode": "Icônes", "iconImages": "Images", "iconLabels": "Libellés (T/E/W)", "iconNone": "Sans icônes", "sizeMeter": "Taille du code : {n} caractères", "sizeOk": "Compatible Gmail", "sizeNear": "Proche de la limite Gmail", "sizeOver": "Dépasse la limite Gmail (10 000)", "previewNote": "L'aperçu montre une largeur réelle de fenêtre e-mail", "studioTag": "PortMix · Helvetique", "toastBrand": "Profil d'entreprise : {n}"}};
+
+const ARIAL   = "Arial,Helvetica,sans-serif";
+const GEORGIA = "Georgia,'Times New Roman',Times,serif";
+
+const BRANDS = {
+  portmix: {
+    key:'portmix', ui:'#C92A2F',
+    logoAsset:'logo', logoFile:'portmix-signature-logo.png', logoScale:1,
+    icons:'images',
+    theme:{
+      nameFont:ARIAL,   nameWeight:700, nameLs:0,  nameCase:'none',      nameColor:'#171717',
+      titleWeight:400,  titleLs:0,      titleCase:'none',      titleColor:'#555555', titleScale:1,
+      compWeight:700,   compLs:0,       compCase:'none',       compColor:'accent',
+      bodyFont:ARIAL,   bodyColor:'#252525',
+      rule:'#D8D8D8',   tagBar:'left',  tagColor:'#333333',    tagLs:1
+    },
+    fields:{
+      company:'PortMix SA', accent:'#ED1C24',
+      tagline:'SMART SOLUTIONS. STRONGER CONNECTIONS.',
+      phone:'+41 21 611 12 14', mobile:'', email:'info@portmix.ch',
+      website:'www.portmix.ch', address:'Route des Toches 3, 1026 Echandens',
+      mapUrl:'', logoUrl:''
+    },
+    showTagline:true
+  },
+  helvetique: {
+    key:'helvetique', ui:'#1c1a17',
+    logoAsset:'logoHelvetique', logoFile:'helvetique-signature-logo.png', logoScale:1.18,
+    icons:'labels',
+    theme:{
+      nameFont:GEORGIA, nameWeight:400, nameLs:.4, nameCase:'none',      nameColor:'#111111',
+      titleWeight:400,  titleLs:1.6,    titleCase:'uppercase', titleColor:'#6f6a63', titleScale:.86,
+      compWeight:400,   compLs:1.4,     compCase:'uppercase',  compColor:'#111111',
+      bodyFont:ARIAL,   bodyColor:'#2b2b2b',
+      rule:'#DCDCDC',   tagBar:'top',   tagColor:'#4a4a4a',    tagLs:1.6
+    },
+    fields:{
+      company:'Helvetique Architecture', accent:'#C10000',
+      tagline:'', phone:'', mobile:'', email:'', website:'', address:'', mapUrl:'', logoUrl:''
+    },
+    showTagline:false
+  }
+};
+
+const PRESETS = {
+  compact:  {w:520, logo:150, name:20, nameLh:25, title:13, titleLh:18, comp:14, compLh:19, body:13, bodyLh:18, icon:15, gap:11, block:15, tag:10, tagLs:1.5, pad:18},
+  standard: {w:600, logo:172, name:21, nameLh:27, title:14, titleLh:19, comp:15, compLh:20, body:13, bodyLh:19, icon:16, gap:12, block:17, tag:10, tagLs:1.8, pad:20},
+  large:    {w:700, logo:200, name:24, nameLh:30, title:16, titleLh:22, comp:17, compLh:23, body:14, bodyLh:20, icon:18, gap:13, block:19, tag:11, tagLs:2,   pad:22}
+};
+
+const brandFieldIds = ['company','accent','tagline','phone','mobile','email','website','address','mapUrl','logoUrl'];
+const fieldIds  = ['fullName','title','company','phone','mobile','email','website','address','mapUrl','accent','tagline','logoUrl'];
+const toggleIds = ['showCompany','showLocation','showTagline'];
+const $ = id => document.getElementById(id);
+
+let currentLang = 'bs';
+let brand = 'portmix';
+let opts = {size:'compact', layout:'split', icons:'images'};
+
+const trDefaultTitles   = Object.values(I18N).map(x => x.defaultTitle);
+const trDefaultTaglines = Object.values(I18N).map(x => x.defaultTagline);
+const tr = k => (I18N[currentLang] && I18N[currentLang][k]) || I18N.en[k] || k;
+const setText = (id,v) => { const e=$(id); if(e) e.textContent=v; };
+const setHtml = (id,v) => { const e=$(id); if(e) e.innerHTML=v; };
+
+function escapeHtml(v){
+  return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function normalizeWebUrl(v){
+  const s=String(v||'').trim();
+  return !s ? '' : (/^https?:\/\//i.test(s) ? s : 'https://'+s);
+}
+const normalizeTel = v => String(v||'').replace(/[^+0-9]/g,'');
+function safeColor(v){
+  let s=String(v||'').trim();
+  if(/^[0-9a-f]{6}$/i.test(s)) s='#'+s;
+  if(/^#[0-9a-f]{3}$/i.test(s)) s='#'+s[1]+s[1]+s[2]+s[2]+s[3]+s[3];
+  return /^#[0-9a-f]{6}$/i.test(s) ? s.toUpperCase() : '#ED1C24';
+}
+const isHosted = () => location.protocol==='https:' || location.protocol==='http:';
+
+function state(){
+  const s={};
+  fieldIds.forEach(id => s[id] = $(id).value.trim());
+  toggleIds.forEach(id => s[id] = $(id).checked);
+  s.accent = safeColor(s.accent);
+  s.brand = BRANDS[brand];
+  Object.assign(s, opts);
+  return s;
+}
+const resolveAsset = (file, b64) => isHosted() ? new URL(file, location.href).href : 'data:image/png;base64,'+b64;
+function resolveLogo(s){
+  if(s.logoUrl) return normalizeWebUrl(s.logoUrl);
+  return resolveAsset(s.brand.logoFile, ASSETS[s.brand.logoAsset]);
+}
+const ICON_FILES = {phone:'icon-phone.png', mail:'icon-mail.png', web:'icon-web.png', location:'icon-location.png'};
+const iconSrc = kind => resolveAsset(ICON_FILES[kind], ASSETS[kind]);
+
+function contactItems(s){
+  const items=[];
+  const mapHref = s.mapUrl
+    ? normalizeWebUrl(s.mapUrl)
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s.address);
+  if(s.phone)   items.push({kind:'phone', label:'T', text:s.phone,   href:'tel:'+normalizeTel(s.phone)});
+  if(s.mobile)  items.push({kind:'phone', label:'M', text:s.mobile,  href:'tel:'+normalizeTel(s.mobile)});
+  if(s.email)   items.push({kind:'mail',  label:'E', text:s.email,   href:'mailto:'+s.email});
+  if(s.website) items.push({kind:'web',   label:'W', text:s.website, href:normalizeWebUrl(s.website)});
+  if(s.showLocation && s.address)
+    items.push({kind:'location', label:'A', text:s.address, href:mapHref, wrap:true});
+  return items;
+}
+
+function link(href, text, color, wrap){
+  const nw = wrap ? '' : 'white-space:nowrap;';
+  return `<a href="${escapeHtml(href)}" style="color:${color} !important;text-decoration:none !important;${nw}">`
+       + `<span style="color:${color} !important;text-decoration:none !important;${nw}">${escapeHtml(text)}</span></a>`;
+}
+
+function contactCell(item, p, s){
+  const t = s.brand.theme;
+  const td = `font-family:${t.bodyFont};font-size:${p.body}px;line-height:${p.bodyLh}px;`
+           + `mso-line-height-rule:exactly;color:${t.bodyColor};vertical-align:middle;`;
+  const body = link(item.href, item.text, t.bodyColor, item.wrap);
+  if(s.icons === 'images'){
+    const iw = p.icon, cell = iw + 9;
+    return `<table role="presentation" border="0" cellpadding="0" cellspacing="0"`
+      + ` style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr>`
+      + `<td width="${cell}" valign="middle" style="width:${cell}px;padding:0 9px 0 0;vertical-align:middle;">`
+      + `<img src="${escapeHtml(iconSrc(item.kind))}" width="${iw}" height="${iw}" alt=""`
+      + ` style="display:block;width:${iw}px;height:${iw}px;border:0;outline:none;text-decoration:none;"></td>`
+      + `<td valign="middle" style="padding:0;${td}">${body}</td></tr></table>`;
+  }
+  if(s.icons === 'labels'){
+    return `<div style="${td}"><span style="color:${s.accent};font-weight:700;letter-spacing:.5px;">`
+      + `${item.label}</span>&nbsp;&nbsp;${body}</div>`;
+  }
+  return `<div style="${td}">${body}</div>`;
+}
+
+const estWidth = (text, fs) => String(text).length * fs * 0.55;
+
+function contactBlock(s, p, width, maxCols){
+  const items = contactItems(s);
+  if(!items.length) return '';
+  const iconW = s.icons === 'images' ? p.icon + 9 : (s.icons === 'labels' ? p.body * 1.6 : 0);
+  const halfCol = Math.floor((width - 33) / 2);
+  const fits = items.filter(it => !it.wrap).every(it => estWidth(it.text, p.body) + iconW <= halfCol);
+  const cols = (maxCols === 2 && fits && items.length > 1) ? 2 : 1;
+  const rule = s.brand.theme.rule;
+  const rows=[];
+  if(cols === 1){
+    items.forEach((it,i) =>
+      rows.push(`<tr><td style="padding:${i?p.gap:0}px 0 0 0;">${contactCell(it,p,s)}</td></tr>`));
+  }else{
+    const gutter = 16;
+    const colA = Math.floor((width - gutter - 1 - gutter) / 2);
+    const colB = width - gutter - 1 - gutter - colA;
+    for(let i=0;i<items.length;i+=2){
+      const a=items[i], b=items[i+1];
+      const pad = i ? `padding:${p.gap}px 0 0 0;` : 'padding:0;';
+      if(b){
+        rows.push(`<tr>`
+          + `<td width="${colA}" valign="middle" style="width:${colA}px;${pad}vertical-align:middle;">${contactCell(a,p,s)}</td>`
+          + `<td width="${gutter}" style="width:${gutter}px;${pad}font-size:0;line-height:0;">&nbsp;</td>`
+          + `<td width="1" bgcolor="${rule}" style="width:1px;background-color:${rule};${pad}font-size:0;line-height:0;">&nbsp;</td>`
+          + `<td width="${gutter}" style="width:${gutter}px;${pad}font-size:0;line-height:0;">&nbsp;</td>`
+          + `<td width="${colB}" valign="middle" style="width:${colB}px;${pad}vertical-align:middle;">${contactCell(b,p,s)}</td>`
+          + `</tr>`);
+      }else{
+        rows.push(`<tr><td colspan="5" valign="middle" style="${pad}vertical-align:middle;">${contactCell(a,p,s)}</td></tr>`);
+      }
+    }
+  }
+  return `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="${width}"`
+    + ` style="width:${width}px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">${rows.join('')}</table>`;
+}
+
+function identityBlock(s, p){
+  const t = s.brand.theme;
+  const base = `mso-line-height-rule:exactly;`;
+  const titleSize = Math.round(p.title * (t.titleScale || 1));
+  let out = `<tr><td style="padding:0;font-family:${t.nameFont};${base}font-size:${p.name}px;`
+    + `line-height:${p.nameLh}px;font-weight:${t.nameWeight};letter-spacing:${t.nameLs}px;`
+    + `color:${t.nameColor};">${escapeHtml(s.fullName)}</td></tr>`;
+  if(s.title)
+    out += `<tr><td style="padding:6px 0 0 0;font-family:${t.bodyFont};${base}font-size:${titleSize}px;`
+      + `line-height:${p.titleLh}px;font-weight:${t.titleWeight};letter-spacing:${t.titleLs}px;`
+      + `text-transform:${t.titleCase};color:${t.titleColor};">${escapeHtml(s.title)}</td></tr>`;
+  if(s.showCompany && s.company){
+    const col = t.compColor === 'accent' ? s.accent : t.compColor;
+    out += `<tr><td style="padding:4px 0 0 0;font-family:${t.bodyFont};${base}font-size:${p.comp}px;`
+      + `line-height:${p.compLh}px;font-weight:${t.compWeight};letter-spacing:${t.compLs}px;`
+      + `text-transform:${t.compCase};color:${col};">${escapeHtml(s.company)}</td></tr>`;
+  }
+  return out;
+}
+
+function taglineBlock(s, p, width, colspan){
+  if(!(s.showTagline && s.tagline)) return '';
+  const t = s.brand.theme;
+  const ls = (p.tagLs * t.tagLs).toFixed(1);
+  const inner = t.tagBar === 'left'
+    ? `<span style="display:inline-block;border-left:3px solid ${s.accent};padding-left:10px;color:${t.tagColor};">${escapeHtml(s.tagline)}</span>`
+    : `<span style="color:${t.tagColor};">${escapeHtml(s.tagline)}</span>`;
+  const topRule = t.tagBar === 'left'
+    ? `<tr><td style="border-top:1px solid ${t.rule};font-size:0;line-height:0;">&nbsp;</td></tr>`
+    : `<tr><td width="46" style="width:46px;border-top:2px solid ${s.accent};font-size:0;line-height:0;">&nbsp;</td></tr>`;
+  return `<tr><td colspan="${colspan}" style="padding:${p.block}px 0 0 0;">`
+    + `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="${width}"`
+    + ` style="width:${width}px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`
+    + topRule
+    + `<tr><td style="padding:${Math.round(p.block*0.7)}px 0 0 0;font-family:${t.bodyFont};`
+    + `font-size:${p.tag}px;line-height:${Math.round(p.tag*1.6)}px;mso-line-height-rule:exactly;`
+    + `letter-spacing:${ls}px;text-transform:uppercase;">${inner}</td></tr></table></td></tr>`;
+}
+
+function buildSignature(s){
+  const p = PRESETS[s.size] || PRESETS.compact;
+  const t = s.brand.theme;
+  const W = p.w;
+  const logoW = Math.round(p.logo * s.brand.logoScale);
+  const logoSrc = escapeHtml(resolveLogo(s));
+  const webHref = escapeHtml(normalizeWebUrl(s.website) || '#');
+  const outer = `role="presentation" border="0" cellpadding="0" cellspacing="0"`;
+  const ts = `border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;`;
+
+  const logoImg = `<a href="${webHref}" style="text-decoration:none;">`
+    + `<img src="${logoSrc}" width="${logoW}" alt="${escapeHtml(s.company || 'Logo')}"`
+    + ` style="display:block;width:${logoW}px;max-width:${logoW}px;height:auto;border:0;outline:none;text-decoration:none;"></a>`;
+
+  if(s.layout === 'stacked'){
+    return `<table ${outer} width="${W}" style="width:${W}px;${ts}background:#ffffff;">`
+      + `<tr><td style="padding:0 0 ${p.block}px 0;">${logoImg}</td></tr>`
+      + `<tr><td><table ${outer} width="${W}" style="width:${W}px;${ts}">${identityBlock(s,p)}</table></td></tr>`
+      + `<tr><td height="${p.block}" style="height:${p.block}px;font-size:0;line-height:${p.block}px;">&nbsp;</td></tr>`
+      + `<tr><td>${contactBlock(s, p, W, 2)}</td></tr>`
+      + taglineBlock(s, p, W, 1)
+      + `</table>`;
+  }
+
+  const logoCol = Math.max(logoW, Math.round(W * 0.33));
+  const gut = p.pad;
+  const rightCol = W - logoCol - gut - 1 - gut;
+
+  return `<table ${outer} width="${W}" style="width:${W}px;${ts}background:#ffffff;">`
+    + `<tr>`
+    + `<td width="${logoCol}" valign="middle" style="width:${logoCol}px;padding:0 ${gut}px 0 0;vertical-align:middle;">${logoImg}</td>`
+    + `<td width="1" bgcolor="${t.rule}" style="width:1px;background-color:${t.rule};font-size:0;line-height:0;">&nbsp;</td>`
+    + `<td width="${rightCol}" valign="top" style="width:${rightCol}px;padding:0 0 0 ${gut}px;vertical-align:top;">`
+    + `<table ${outer} width="${rightCol}" style="width:${rightCol}px;${ts}">`
+    + identityBlock(s,p)
+    + `<tr><td height="${p.block}" style="height:${p.block}px;font-size:0;line-height:${p.block}px;">&nbsp;</td></tr>`
+    + `<tr><td>${contactBlock(s, p, rightCol, 2)}</td></tr>`
+    + `</table></td></tr>`
+    + taglineBlock(s, p, W, 3)
+    + `</table>`;
+}
+
+function mobileText(s){
+  const l=[s.fullName];
+  if(s.title) l.push(s.title);
+  if(s.showCompany && s.company) l.push(s.company);
+  l.push('');
+  if(s.phone)   l.push('T: '+s.phone);
+  if(s.mobile)  l.push('M: '+s.mobile);
+  if(s.email)   l.push('E: '+s.email);
+  if(s.website) l.push('W: '+s.website);
+  if(s.showLocation && s.address) l.push('A: '+s.address);
+  if(s.showTagline && s.tagline) l.push('', s.tagline);
+  return l.join('\n');
+}
+
+const GMAIL_LIMIT = 10000;
+
+function render(){
+  const s = state();
+  const html = buildSignature(s);
+  $('signaturePreview').innerHTML = html;
+  $('htmlOutput').textContent = html;
+
+  const len = html.length;
+  $('sizeBar').style.width = Math.min(100, Math.round(len/GMAIL_LIMIT*100)) + '%';
+  setText('sizeMeterLabel', tr('sizeMeter').replace('{n}', len.toLocaleString(currentLang==='bs'?'bs-BA':currentLang)));
+  const meter = $('sizeMeter');
+  meter.classList.remove('warn','bad');
+  if(len > GMAIL_LIMIT){ meter.classList.add('bad'); setText('sizeStatus', tr('sizeOver')); }
+  else if(len > GMAIL_LIMIT*0.8){ meter.classList.add('warn'); setText('sizeStatus', tr('sizeNear')); }
+  else setText('sizeStatus', tr('sizeOk'));
+
+  const packageHosted = !s.logoUrl && isHosted();
+  const notice = $('logoNotice');
+  notice.className = 'note' + (!s.logoUrl && !packageHosted && len > GMAIL_LIMIT ? ' alert' : '');
+  notice.innerHTML = s.logoUrl ? tr('logoHosted') : packageHosted ? tr('logoPackage') : tr('logoOffline');
+}
+
+function renderGuides(){
+  $('installGrid').innerHTML = (tr('guides')||[]).map(g => `
+    <article class="guide">
+      <span class="tag">${g.tag}</span><h3>${g.title}</h3>${g.html}
+      ${g.url ? `<p><a href="${g.url}" target="_blank" rel="noopener">${g.link}</a></p>` : ''}
+    </article>`).join('');
+}
+
+function setSeg(segId, attr, value){
+  [...$(segId).children].forEach(b => b.classList.toggle('active', b.dataset[attr] === value));
+}
+
+function applyBrand(next, {migrate=true} = {}){
+  const from = BRANDS[brand], to = BRANDS[next];
+  if(migrate && from !== to){
+    brandFieldIds.forEach(id => {
+      const el = $(id);
+      if(el.value.trim() === String(from.fields[id] ?? '')) el.value = to.fields[id] ?? '';
+    });
+    if(to.key === 'helvetique' && trDefaultTaglines.includes($('tagline').value.trim())) $('tagline').value = '';
+    $('showTagline').checked = to.showTagline;
+    opts.icons = to.icons;
+    setSeg('iconSeg','icons',opts.icons);
+  }
+  brand = next;
+  document.documentElement.style.setProperty('--accent', to.ui);
+  $('accentPicker').value = safeColor($('accent').value);
+  [...$('brandSwitch').children].forEach(b => b.classList.toggle('active', b.dataset.brand === next));
+  render();
+}
+
+function applyLanguage(lang, {updateDefaults=true}={}){
+  currentLang = I18N[lang] ? lang : 'bs';
+  try{ localStorage.setItem('signatureStudioLanguage', currentLang); }catch(e){}
+  document.documentElement.lang = currentLang;
+  document.title = tr('docTitle');
+  $('languageSelect').value = currentLang;
+
+  const map = {
+    brandSubtitle:'studioTag', languageLabel:'language', resetBtn:'reset',
+    mobileTextBtn:'copyMobile', copyBtn:'copySignature', downloadBtn:'downloadHtml',
+    editorEyebrow:'editor', signatureDetailsTitle:'signatureDetails', identityTitle:'identity',
+    fullNameLabel:'fullName', jobTitleLabel:'jobTitle', companyLabel:'company',
+    contactTitle:'contact', phoneLabel:'phone', mobileLabel:'mobilePhone', emailLabel:'email',
+    websiteLabel:'website', addressLabel:'address', formatTitle:'format', sizeLabel:'size',
+    layoutLabel:'layout', iconModeLabel:'iconMode', brandTitle:'brand', accentLabel:'accent',
+    taglineLabel:'tagline', optionsTitle:'options', showCompanyTitle:'showCompany',
+    showCompanyDesc:'showCompanyDesc', showLocationTitle:'showLocation',
+    showLocationDesc:'showLocationDesc', showTaglineTitle:'showTagline',
+    showTaglineDesc:'showTaglineDesc', livePreviewLabel:'livePreview',
+    generatedHtmlLabel:'generatedHtml', copyCodeBtn:'copyCode',
+    installationEyebrow:'installation', installationTitle:'installationTitle',
+    guidanceNote:'guidance', sourceNote:'source', footerText:'footer'
+  };
+  Object.entries(map).forEach(([id,key]) => setText(id, tr(key)));
+  setHtml('mapUrlLabel', tr('mapLink'));
+  setHtml('logoUrlLabel', tr('logoUrl'));
+  setHtml('messageCopy', tr('message'));
+  setHtml('deploymentNotice', tr('deployment'));
+  setHtml('bestPracticeNotice', tr('bestPractice'));
+
+  [['sizeSeg',['sizeCompact','sizeStandard','sizeLarge']],
+   ['layoutSeg',['layoutSplit','layoutStacked']],
+   ['iconSeg',['iconImages','iconLabels','iconNone']]]
+   .forEach(([id,keys]) => keys.forEach((k,i) => $(id).children[i].textContent = tr(k)));
+
+  setText('htmlBtn', $('codePanel').classList.contains('open') ? tr('hideHtml') : tr('viewHtml'));
+  setText('modeStatus', tr('previewNote'));
+
+  if(updateDefaults && brand === 'portmix'){
+    if(trDefaultTitles.includes($('title').value.trim()))     $('title').value = tr('defaultTitle');
+    if(trDefaultTaglines.includes($('tagline').value.trim())) $('tagline').value = tr('defaultTagline');
+  }
+  renderGuides();
+  render();
+}
+
+function toast(msg){
+  const el=$('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(window.__t); window.__t=setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+async function copySignature(){
+  const s = state(), html = buildSignature(s), plain = mobileText(s);
+  try{
+    const box = document.createElement('div');
+    box.setAttribute('contenteditable','true');
+    box.style.cssText='position:fixed;left:-10000px;top:0;background:#fff;color:#252525;font-family:Arial,Helvetica,sans-serif;';
+    box.innerHTML = html;
+    document.body.appendChild(box);
+    const range = document.createRange();
+    range.selectNodeContents(box);
+    const sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    const ok = document.execCommand('copy');
+    sel.removeAllRanges(); box.remove();
+    if(ok){ toast(tr('toastSignature')); return; }
+  }catch(e){}
+  try{
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html': new Blob([html],{type:'text/html'}),
+        'text/plain': new Blob([plain],{type:'text/plain'})
+      })]);
+      toast(tr('toastSignature')); return;
+    }
+    throw new Error('unsupported');
+  }catch(e){ toast(tr('toastBlocked')); }
+}
+
+async function copyText(text, msg){
+  try{ await navigator.clipboard.writeText(text); toast(msg); }
+  catch(e){
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;left:-9999px';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast(msg); }catch(_){ toast(tr('toastBlocked')); }
+    ta.remove();
+  }
+}
+
+function downloadSignature(){
+  const s = state();
+  const doc = `<!doctype html><html lang="${currentLang}"><head><meta charset="utf-8">`
+    + `<title>${escapeHtml(s.fullName)} — ${escapeHtml(tr('emailSignatureTitle'))}</title></head>`
+    + `<body style="margin:32px;background:#ffffff;">${buildSignature(s)}</body></html>`;
+  const url = URL.createObjectURL(new Blob([doc],{type:'text/html;charset=utf-8'}));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (s.fullName||'signature').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')
+    + '-' + brand + '-signature.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(tr('toastDownloaded'));
+}
+
+fieldIds.forEach(id => $(id).addEventListener('input', render));
+toggleIds.forEach(id => $(id).addEventListener('change', render));
+
+$('accentPicker').addEventListener('input', e => { $('accent').value = e.target.value.toUpperCase(); render(); });
+$('accent').addEventListener('input', () => { $('accentPicker').value = safeColor($('accent').value); render(); });
+
+function segment(segId, key, attr){
+  $(segId).addEventListener('click', e => {
+    const btn = e.target.closest('button[data-'+attr+']');
+    if(!btn) return;
+    opts[key] = btn.dataset[attr];
+    setSeg(segId, attr, opts[key]);
+    render();
+  });
+}
+segment('sizeSeg','size','size');
+segment('layoutSeg','layout','layout');
+segment('iconSeg','icons','icons');
+
+$('brandSwitch').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-brand]');
+  if(!btn || btn.dataset.brand === brand) return;
+  applyBrand(btn.dataset.brand);
+  toast(tr('toastBrand').replace('{n}', BRANDS[brand].fields.company));
+});
+
+$('previewSeg').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-preview]');
+  if(!btn) return;
+  setSeg('previewSeg','preview',btn.dataset.preview);
+  $('mailWindow').style.maxWidth = btn.dataset.preview + 'px';
+});
+
+$('languageSelect').addEventListener('change', e => applyLanguage(e.target.value));
+$('copyBtn').addEventListener('click', copySignature);
+$('mobileTextBtn').addEventListener('click', () => copyText(mobileText(state()), tr('toastMobile')));
+$('copyCodeBtn').addEventListener('click', () => copyText(buildSignature(state()), tr('toastCode')));
+$('downloadBtn').addEventListener('click', downloadSignature);
+
+$('htmlBtn').addEventListener('click', () => {
+  const open = $('codePanel').classList.toggle('open');
+  setText('htmlBtn', open ? tr('hideHtml') : tr('viewHtml'));
+});
+
+$('resetBtn').addEventListener('click', () => {
+  const b = BRANDS[brand];
+  brandFieldIds.forEach(id => $(id).value = b.fields[id] ?? '');
+  if(brand === 'portmix'){
+    $('fullName').value = 'Nasuf Biljibani';
+    $('title').value = tr('defaultTitle');
+    $('tagline').value = tr('defaultTagline');
+  }
+  $('showCompany').checked = true;
+  $('showLocation').checked = true;
+  $('showTagline').checked = b.showTagline;
+  opts = {size:'compact', layout:'split', icons:b.icons};
+  setSeg('sizeSeg','size',opts.size);
+  setSeg('layoutSeg','layout',opts.layout);
+  setSeg('iconSeg','icons',opts.icons);
+  $('accentPicker').value = safeColor($('accent').value);
+  render();
+  toast(tr('toastReset'));
+});
+
+let saved=null;
+try{ saved = localStorage.getItem('signatureStudioLanguage'); }catch(e){}
+const bl = (navigator.language||'').toLowerCase();
+applyBrand('portmix', {migrate:false});
+applyLanguage(
+  saved && I18N[saved] ? saved
+  : bl.startsWith('de') ? 'de'
+  : bl.startsWith('fr') ? 'fr'
+  : bl.startsWith('en') ? 'en' : 'bs'
+);
+})();
+</script>
+</body>
+</html>

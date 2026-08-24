@@ -1,0 +1,15 @@
+# PortMix SA
+
+> Menuiserie intérieure sur mesure en Suisse romande — portes, armoires et dressings conçus, fabriqués et posés par la même équipe. Entreprise familiale suisse fondée en 2017. Showroom à Echandens (VD), succursale à Genève.
+
+## Pages
+
+- [Accueil](https://www.portmix.ch/) : présentation de l'entreprise, savoir-faire et projets phares
+- [Services](https://www.portmix.ch/services) : portes de toutes sortes (intérieures, coulissantes, techniques, coupe-feu), armoires et placards sur mesure, dressings ; processus du conseil à la pose
+- [Réalisations](https://www.portmix.ch/realisations) : projets en cours et réalisés pour entreprises générales, promoteurs et architectes en Suisse romande
+- [À propos](https://www.portmix.ch/a-propos) : histoire de l'entreprise familiale, fondée par Nasuf Biljibani en 2017
+- [Contact](https://www.portmix.ch/contact) : Route des Toches 3, 1026 Echandens ; +41 21 611 12 14 ; info@portmix.ch
+
+## Langues
+
+Site disponible en français (par défaut, sans préfixe), allemand (/de), anglais (/en) et italien (/it).

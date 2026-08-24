@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Inter, Sora } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
@@ -34,6 +35,10 @@ export const viewport: Viewport = {
     themeColor: '#1d1a17'
 };
 
+// Google Analytics 4 — inactive until NEXT_PUBLIC_GA_ID (G-XXXXXXX) is set
+// in the deploy environment.
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 export async function generateMetadata({
     params
 }: {
@@ -66,6 +71,17 @@ export default async function LocaleLayout({
         <html lang={locale} className={`${inter.variable} ${sora.variable} antialiased`}>
             <body className="min-h-screen flex flex-col bg-ink text-cream">
                 <StructuredData description={t('description')} />
+                {GA_ID && (
+                    <>
+                        <Script
+                            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+                            strategy="afterInteractive"
+                        />
+                        <Script id="ga4" strategy="afterInteractive">
+                            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}
+                        </Script>
+                    </>
+                )}
                 <NextIntlClientProvider>
                     <Preloader />
                     <Cursor />

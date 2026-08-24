@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { MapPin, Phone, Mail, DoorOpen } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 import Reveal from '@/components/Reveal';
 import ContactForm from '@/components/ContactForm';
 import { COMPANY } from '@/lib/company';
@@ -60,6 +61,7 @@ export default async function ContactPage({
 
     return (
         <>
+            <BreadcrumbJsonLd locale={locale} path="/contact" labelKey="contact" />
             <PageHeader kicker={t('kicker')} title={t('title')} intro={t('intro')} />
 
             <section className="mx-auto max-w-7xl px-5 py-24 lg:px-8 lg:py-32">

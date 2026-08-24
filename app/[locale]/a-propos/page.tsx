@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Award, Ruler, HeartHandshake, UserRound } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 import Reveal from '@/components/Reveal';
 import TiltCard from '@/components/TiltCard';
 import ImageReveal from '@/components/ImageReveal';
@@ -53,6 +54,7 @@ export default async function AboutPage({
 
     return (
         <>
+            <BreadcrumbJsonLd locale={locale} path="/a-propos" labelKey="about" />
             <PageHeader kicker={t('kicker')} title={t('title')} />
 
             {/* Story */}

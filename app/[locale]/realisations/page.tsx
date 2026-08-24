@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import PageHeader from '@/components/PageHeader';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 import Reveal from '@/components/Reveal';
 import ProjectsGrid from '@/components/ProjectsGrid';
 import { buildMetadata } from '@/lib/seo';
@@ -35,6 +36,7 @@ export default async function RealisationsPage({
 
     return (
         <>
+            <BreadcrumbJsonLd locale={locale} path="/realisations" labelKey="realisations" />
             <PageHeader kicker={t('kicker')} title={t('title')} intro={t('intro')} />
 
             {/* Ongoing projects */}

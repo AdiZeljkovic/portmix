@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Check, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import PageHeader from '@/components/PageHeader';
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 import Reveal from '@/components/Reveal';
 import ImageReveal from '@/components/ImageReveal';
 import Magnetic from '@/components/Magnetic';
@@ -41,6 +42,7 @@ export default async function ServicesPage({
 
     return (
         <>
+            <BreadcrumbJsonLd locale={locale} path="/services" labelKey="services" />
             <PageHeader kicker={t('kicker')} title={t('title')} intro={t('intro')} />
 
             {/* Alternating service sections */}

@@ -43,6 +43,18 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          // Belt-and-braces with app/robots.ts for staging deployments.
+          ...(process.env.NOINDEX === "1"
+            ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
+            : []),
+        ],
+      },
+      {
+        // Raw /images assets have no build fingerprint — cache a day, then
+        // revalidate (optimized /_next/image responses cache separately).
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],
       },
       {

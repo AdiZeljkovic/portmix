@@ -32,7 +32,24 @@ const nextConfig: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  compress: true,
+  /**
+   * 🚨 Kompresiju radi Traefik, ne Next — zato je ovdje `false`.
+   *
+   * Next zna samo gzip. Dok je bio uključen, on bi odgovor spakovao prvi, a
+   * Traefik gotov odgovor više ne dira — pa se Brotli nikad nije javio.
+   * Izmjereno na produkciji: pravi preglednik (`Accept-Encoding: gzip,
+   * deflate, br, zstd`) dobijao je **gzip, 21.811 B**; Brotli se javljao samo
+   * ako klijent zatraži isključivo `br`, što nijedan preglednik ne radi.
+   *
+   * Sa ovim isključenim Traefik komprimuje, i isti odgovor je **16.958 B** —
+   * oko 22% manje, na svakoj stranici i svakom posjetiocu.
+   *
+   * ⚠️ Ako se ovo ikad vrati na `true`, Brotli tiho prestaje raditi: ništa
+   * neće puknuti, sajt će samo postati veći. Serverska strana je u
+   * `/etc/dokploy/traefik/dynamic/portmix-www.yml`, middleware
+   * `portmix-compress`.
+   */
+  compress: false,
   poweredByHeader: false,
   async headers() {
     return [

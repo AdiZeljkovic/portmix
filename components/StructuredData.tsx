@@ -25,6 +25,8 @@ export default function StructuredData({
                 '@id': `${BASE_URL}/#business`,
                 name: COMPANY.name,
                 url: BASE_URL,
+                logo: `${BASE_URL}/images/brand/logo.png`,
+                image: `${BASE_URL}/og.jpg`,
                 telephone: COMPANY.phone,
                 email: COMPANY.email,
                 description,

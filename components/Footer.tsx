@@ -3,6 +3,7 @@ import { MapPin, Phone, Mail } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { COMPANY } from '@/lib/company';
 import Logo from './Logo';
+import Year from './Year';
 
 const NAV_ITEMS = [
     { href: '/', key: 'home' },
@@ -79,7 +80,7 @@ export default function Footer() {
             <div className="border-t border-line">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-5 py-6 text-xs text-muted sm:flex-row lg:px-8">
                     <span>
-                        © {new Date().getFullYear()} {COMPANY.name}. {t('footer.rights')}
+                        © <Year /> {COMPANY.name}. {t('footer.rights')}
                     </span>
                     <span className="italic">{COMPANY.tagline}</span>
                 </div>

@@ -14,14 +14,16 @@ import StructuredData from '@/components/StructuredData';
 import { buildMetadata } from '@/lib/seo';
 import '../globals.css';
 
+// The 'latin' subset already covers fr/de/en/it (accents, ß, œ) — dropping
+// latin-ext halves the font payload.
 const inter = Inter({
     variable: '--font-inter',
-    subsets: ['latin', 'latin-ext']
+    subsets: ['latin']
 });
 
 const sora = Sora({
     variable: '--font-sora',
-    subsets: ['latin', 'latin-ext']
+    subsets: ['latin']
 });
 
 export function generateStaticParams() {

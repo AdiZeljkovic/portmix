@@ -20,8 +20,11 @@ export default function AnimatedText({
 
     if (reduce) return <span className={className}>{text}</span>;
 
+    // Screen readers get the plain text; the animated per-word markup is
+    // aria-hidden (aria-label is not valid on a plain <span>).
     return (
-        <span className={className} aria-label={text}>
+        <span className={className}>
+            <span className="sr-only">{text}</span>
             {words.map((word, i) => (
                 <span
                     key={`${word}-${i}`}

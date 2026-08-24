@@ -4,6 +4,9 @@
   /* Brand palette — red from the PortMix logo, warm dark neutrals */
   --color-brand: #e32526;
   --color-brand-dark: #b81d1e;
+  /* Lighter tint for small red text on dark surfaces — passes AA (4.5:1)
+     on ink, ink-soft and ink-card alike */
+  --color-brand-soft: #f4716d;
   --color-ink: #1d1a17;
   --color-ink-soft: #272320;
   --color-ink-card: #322d28;
@@ -56,7 +59,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--color-brand);
+  color: var(--color-brand-soft);
 }
 
 /* 3D tilt cards */

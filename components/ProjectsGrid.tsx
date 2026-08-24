@@ -54,7 +54,7 @@ export default function ProjectsGrid({
                                 <div className="mt-5">
                                     <h3 className="font-display text-lg font-bold">{project.name}</h3>
                                     {client && (
-                                        <p className="mt-1 text-xs uppercase tracking-wider text-brand">
+                                        <p className="mt-1 text-xs uppercase tracking-wider text-brand-soft">
                                             {client.name}
                                         </p>
                                     )}

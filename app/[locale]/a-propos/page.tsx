@@ -4,6 +4,7 @@ import { Award, Ruler, HeartHandshake } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd';
 import Reveal from '@/components/Reveal';
+import TiltCard from '@/components/TiltCard';
 import ImageReveal from '@/components/ImageReveal';
 import AnimatedText from '@/components/AnimatedText';
 import { ORG } from '@/lib/company';
@@ -212,55 +213,72 @@ export default async function AboutPage({
 
                 <div className="mt-14">
                     {/* Direction */}
-                    <Reveal className="flex justify-center">
-                        <div className="w-full max-w-xs rounded-2xl border border-line border-t-2 border-t-brand bg-ink-card p-8 text-center">
-                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-xl font-bold text-white">
-                                {initials(ORG.lead.name)}
-                            </div>
-                            <h3 className="mt-5 font-display text-xl font-bold">{ORG.lead.name}</h3>
-                            <p className="mt-1 text-sm text-brand-soft">{t(ORG.lead.roleKey)}</p>
+                    <Reveal className="relative flex justify-center">
+                        {/* Soft brand glow behind the direction card */}
+                        <div
+                            aria-hidden
+                            className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/10 blur-3xl"
+                        />
+                        <div className="relative w-full max-w-xs">
+                            <TiltCard className="rounded-2xl border border-line border-t-2 border-t-brand bg-ink-card p-8 text-center">
+                                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-xl font-bold text-white ring-2 ring-brand/25 ring-offset-4 ring-offset-ink-card">
+                                    {initials(ORG.lead.name)}
+                                </div>
+                                <h3 className="mt-5 font-display text-xl font-bold">{ORG.lead.name}</h3>
+                                <p className="mt-1 text-sm text-brand-soft">{t(ORG.lead.roleKey)}</p>
+                            </TiltCard>
                         </div>
                     </Reveal>
 
                     {/* Connectors down to the two branches */}
                     <div aria-hidden className="hidden lg:block">
-                        <div className="mx-auto h-10 w-px bg-cream/15" />
+                        <div className="relative mx-auto h-10 w-px bg-gradient-to-b from-brand/70 to-cream/20">
+                            <span className="absolute -bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-brand/70" />
+                        </div>
                         <div className="relative mx-auto h-10 w-1/2">
-                            <div className="absolute inset-x-0 top-0 h-px bg-cream/15" />
-                            <div className="absolute left-0 top-0 h-full w-px bg-cream/15" />
-                            <div className="absolute right-0 top-0 h-full w-px bg-cream/15" />
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cream/10 via-cream/30 to-cream/10" />
+                            <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-cream/25 to-brand/60" />
+                            <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-cream/25 to-brand/60" />
                         </div>
                     </div>
-                    <div aria-hidden className="mx-auto h-10 w-px bg-cream/15 lg:hidden" />
+                    <div
+                        aria-hidden
+                        className="mx-auto h-10 w-px bg-gradient-to-b from-brand/70 to-cream/20 lg:hidden"
+                    />
 
                     {/* Branches */}
                     <div className="grid gap-14 lg:grid-cols-2 lg:gap-10">
                         {ORG.branches.map((branch, bi) => (
                             <div key={branch.head.name}>
                                 <Reveal delay={bi * 0.12} className="flex justify-center">
-                                    <div className="w-full max-w-xs rounded-2xl border border-line border-t-2 border-t-brand bg-ink-card p-6 text-center">
-                                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-lg font-bold text-white">
-                                            {initials(branch.head.name)}
-                                        </div>
-                                        <h3 className="mt-4 font-display text-lg font-bold">
-                                            {branch.head.name}
-                                        </h3>
-                                        <p className="mt-1 text-sm text-brand-soft">
-                                            {t(branch.head.roleKey)}
-                                        </p>
+                                    <div className="w-full max-w-xs">
+                                        <TiltCard className="rounded-2xl border border-line border-t-2 border-t-brand bg-ink-card p-6 text-center">
+                                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-lg font-bold text-white ring-2 ring-brand/20 ring-offset-4 ring-offset-ink-card">
+                                                {initials(branch.head.name)}
+                                            </div>
+                                            <h3 className="mt-4 font-display text-lg font-bold">
+                                                {branch.head.name}
+                                            </h3>
+                                            <p className="mt-1 text-sm text-brand-soft">
+                                                {t(branch.head.roleKey)}
+                                            </p>
+                                        </TiltCard>
                                     </div>
                                 </Reveal>
 
-                                <div aria-hidden className="mx-auto h-8 w-px bg-cream/15" />
+                                <div
+                                    aria-hidden
+                                    className="mx-auto h-8 w-px bg-gradient-to-b from-brand/50 to-cream/15"
+                                />
 
                                 <Reveal delay={bi * 0.12 + 0.08}>
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         {branch.members.map((m) => (
-                                            <div
+                                            <TiltCard
                                                 key={m.name}
-                                                className="flex items-center gap-4 rounded-2xl border border-line bg-ink-card p-5"
+                                                className="flex items-center gap-4 rounded-2xl border border-line bg-ink-card p-5 transition-colors hover:border-brand/40"
                                             >
-                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display font-bold text-white">
+                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display font-bold text-white ring-1 ring-brand/20 ring-offset-2 ring-offset-ink-card">
                                                     {initials(m.name)}
                                                 </div>
                                                 <div className="min-w-0">
@@ -275,23 +293,38 @@ export default async function AboutPage({
                                                         {t(m.roleKey)}
                                                     </p>
                                                     {m.badgeKey && (
-                                                        <span className="mt-1.5 inline-block rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-soft">
-                                                            {t(m.badgeKey)}
-                                                        </span>
+                                                        <>
+                                                            <span className="mt-1.5 inline-block rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-soft">
+                                                                {t(m.badgeKey)}
+                                                            </span>
+                                                            {/* Echo of the client's chart: one dot per installer */}
+                                                            <span aria-hidden className="mt-2 flex gap-1.5">
+                                                                {Array.from({ length: 10 }).map((_, di) => (
+                                                                    <span
+                                                                        key={di}
+                                                                        className="h-1.5 w-1.5 rounded-full bg-brand/45"
+                                                                    />
+                                                                ))}
+                                                            </span>
+                                                        </>
                                                     )}
                                                 </div>
-                                            </div>
+                                            </TiltCard>
                                         ))}
 
                                         {branch.department && (
-                                            <div className="rounded-2xl border border-dashed border-brand/40 bg-brand/5 p-5 sm:col-span-2">
+                                            <div className="relative overflow-hidden rounded-2xl border border-dashed border-brand/40 bg-brand/5 p-5 sm:col-span-2">
+                                                <div
+                                                    aria-hidden
+                                                    className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-brand/15 blur-2xl"
+                                                />
                                                 <p className="text-xs font-semibold uppercase tracking-wider text-brand-soft">
                                                     {branch.department.name}
                                                 </p>
                                                 <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
                                                     {branch.department.members.map((name) => (
                                                         <div key={name} className="flex items-center gap-3">
-                                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-sm font-bold text-white">
+                                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-sm font-bold text-white ring-1 ring-brand/25 ring-offset-2 ring-offset-ink">
                                                                 {initials(name)}
                                                             </div>
                                                             <span className="font-display font-bold">

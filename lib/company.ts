@@ -17,30 +17,54 @@ export const COMPANY = {
     country: 'CH'
 } as const;
 
-// Team members. `roleKey` maps to about.role* translations.
-// `photo` stays null until real photos arrive — a monogram avatar is shown instead.
-export type TeamMember = {
+// Organizational chart, exactly as supplied by the client (first names and
+// spellings preserved). Role keys map to about.role* translations; the
+// department name is a brand and stays untranslated across locales.
+export type OrgPerson = {
     name: string;
     roleKey:
-        | 'roleFounder'
-        | 'roleCommercial'
-        | 'roleProjectLead'
-        | 'roleAssistant'
-        | 'roleClientCare'
-        | 'roleInstallLead'
-        | 'roleArchitect';
-    photo: string | null;
-    placeholder?: boolean; // reserved seat, no person yet
+        | 'roleGm'
+        | 'roleDesignSales'
+        | 'roleTechDev'
+        | 'roleAdmin'
+        | 'roleFinance'
+        | 'roleExec'
+        | 'rolePm'
+        | 'roleInstall';
+    italic?: boolean; // rendered in italics, as in the client's chart
+    badgeKey?: 'orgInstallers';
 };
 
-export const TEAM: TeamMember[] = [
-    { name: 'Nasuf Biljibani', roleKey: 'roleFounder', photo: null },
-    { name: 'Michael Maglio', roleKey: 'roleCommercial', photo: null },
-    { name: 'Laurent Nombret', roleKey: 'roleProjectLead', photo: null },
-    { name: 'Damien Canipel', roleKey: 'roleProjectLead', photo: null },
-    { name: 'Nassem Ait-Khelifa', roleKey: 'roleProjectLead', photo: null },
-    { name: 'Daniel Murgia', roleKey: 'roleAssistant', photo: null },
-    { name: 'Ensara Biljibani', roleKey: 'roleClientCare', photo: null },
-    { name: 'Tiago Sousa Ferreira', roleKey: 'roleInstallLead', photo: null },
-    { name: '', roleKey: 'roleArchitect', photo: null, placeholder: true }
-];
+export type OrgBranch = {
+    head: OrgPerson;
+    members: OrgPerson[];
+    department?: { name: string; members: string[] };
+};
+
+export const ORG: { lead: OrgPerson; branches: OrgBranch[] } = {
+    lead: { name: 'Nasuf', roleKey: 'roleGm' },
+    branches: [
+        {
+            head: { name: 'Elma', roleKey: 'roleDesignSales' },
+            members: [
+                { name: 'Kenan', roleKey: 'roleAdmin' },
+                { name: 'Enes', roleKey: 'roleFinance' },
+                { name: 'Julie', roleKey: 'roleExec', italic: true }
+            ]
+        },
+        {
+            head: { name: 'Naseem', roleKey: 'roleTechDev' },
+            members: [
+                { name: 'Damien', roleKey: 'rolePm' },
+                { name: 'Laurent', roleKey: 'rolePm' },
+                { name: 'Ajla', roleKey: 'rolePm' },
+                { name: 'Tariq', roleKey: 'rolePm' },
+                { name: 'Thiago', roleKey: 'roleInstall', badgeKey: 'orgInstallers' }
+            ],
+            department: {
+                name: 'Interior Architecture Office by PortMix',
+                members: ['Ensara', 'Elyna']
+            }
+        }
+    ]
+};

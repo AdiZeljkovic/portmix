@@ -274,42 +274,44 @@ export default async function AboutPage({
                                 <Reveal delay={bi * 0.12 + 0.08}>
                                     <div className="grid gap-4 sm:grid-cols-2">
                                         {branch.members.map((m) => (
-                                            <TiltCard
+                                            <div
                                                 key={m.name}
-                                                className="flex items-center gap-4 rounded-2xl border border-line bg-ink-card p-5 transition-colors hover:border-brand/40"
+                                                className={m.badgeKey ? 'sm:col-span-2' : ''}
                                             >
-                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display font-bold text-white ring-1 ring-brand/20 ring-offset-2 ring-offset-ink-card">
-                                                    {initials(m.name)}
+                                            <TiltCard
+                                                className={`flex items-center gap-4 rounded-2xl border border-line bg-ink-card p-5 transition-colors hover:border-brand/40 ${
+                                                    m.badgeKey ? 'flex-wrap justify-between' : ''
+                                                }`}
+                                            >
+                                                <div className="flex min-w-0 items-center gap-4">
+                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display font-bold text-white ring-1 ring-brand/20 ring-offset-2 ring-offset-ink-card">
+                                                        {initials(m.name)}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h4 className="font-display font-bold">{m.name}</h4>
+                                                        <p className="mt-0.5 text-xs uppercase tracking-wider text-brand-soft">
+                                                            {t(m.roleKey)}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <h4
-                                                        className={`font-display font-bold ${
-                                                            m.italic ? 'italic' : ''
-                                                        }`}
-                                                    >
-                                                        {m.name}
-                                                    </h4>
-                                                    <p className="mt-0.5 text-xs uppercase tracking-wider text-brand-soft">
-                                                        {t(m.roleKey)}
-                                                    </p>
-                                                    {m.badgeKey && (
-                                                        <>
-                                                            <span className="mt-1.5 inline-block rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-soft">
-                                                                {t(m.badgeKey)}
-                                                            </span>
-                                                            {/* Echo of the client's chart: one dot per installer */}
-                                                            <span aria-hidden className="mt-2 flex gap-1.5">
-                                                                {Array.from({ length: 10 }).map((_, di) => (
-                                                                    <span
-                                                                        key={di}
-                                                                        className="h-1.5 w-1.5 rounded-full bg-brand/45"
-                                                                    />
-                                                                ))}
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
+                                                {m.badgeKey && (
+                                                    /* The installation crew, front and centre */
+                                                    <div className="rounded-xl bg-brand/10 px-4 py-3 text-right">
+                                                        <p className="font-display text-lg font-bold text-brand-soft">
+                                                            {t(m.badgeKey)}
+                                                        </p>
+                                                        <span aria-hidden className="mt-2 flex justify-end gap-1.5">
+                                                            {Array.from({ length: 10 }).map((_, di) => (
+                                                                <span
+                                                                    key={di}
+                                                                    className="h-2 w-2 rounded-full bg-brand/60"
+                                                                />
+                                                            ))}
+                                                        </span>
+                                                    </div>
+                                                )}
                                             </TiltCard>
+                                            </div>
                                         ))}
 
                                         {branch.department && (
@@ -321,15 +323,20 @@ export default async function AboutPage({
                                                 <p className="text-xs font-semibold uppercase tracking-wider text-brand-soft">
                                                     {branch.department.name}
                                                 </p>
-                                                <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-                                                    {branch.department.members.map((name) => (
-                                                        <div key={name} className="flex items-center gap-3">
-                                                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-sm font-bold text-white ring-1 ring-brand/25 ring-offset-2 ring-offset-ink">
-                                                                {initials(name)}
+                                                <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4">
+                                                    {branch.department.members.map((p) => (
+                                                        <div key={p.name} className="flex items-center gap-3">
+                                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark font-display text-sm font-bold text-white ring-1 ring-brand/25 ring-offset-2 ring-offset-ink">
+                                                                {initials(p.name)}
                                                             </div>
-                                                            <span className="font-display font-bold">
-                                                                {name}
-                                                            </span>
+                                                            <div>
+                                                                <span className="font-display font-bold">
+                                                                    {p.name}
+                                                                </span>
+                                                                <p className="mt-0.5 text-xs uppercase tracking-wider text-brand-soft">
+                                                                    {t(p.roleKey)}
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -340,10 +347,6 @@ export default async function AboutPage({
                             </div>
                         ))}
                     </div>
-
-                    <Reveal className="mx-auto mt-14 max-w-2xl text-center">
-                        <p className="text-sm italic leading-relaxed text-muted">{t('orgNote')}</p>
-                    </Reveal>
                 </div>
             </section>
         </>

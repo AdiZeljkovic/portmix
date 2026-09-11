@@ -28,17 +28,17 @@ export type OrgPerson = {
         | 'roleTechDev'
         | 'roleAdmin'
         | 'roleFinance'
-        | 'roleExec'
         | 'rolePm'
-        | 'roleInstall';
-    italic?: boolean; // rendered in italics, as in the client's chart
+        | 'roleInstall'
+        | 'roleClientCare'
+        | 'roleInterior';
     badgeKey?: 'orgInstallers';
 };
 
 export type OrgBranch = {
     head: OrgPerson;
     members: OrgPerson[];
-    department?: { name: string; members: string[] };
+    department?: { name: string; members: OrgPerson[] };
 };
 
 export const ORG: { lead: OrgPerson; branches: OrgBranch[] } = {
@@ -48,8 +48,7 @@ export const ORG: { lead: OrgPerson; branches: OrgBranch[] } = {
             head: { name: 'Elma', roleKey: 'roleDesignSales' },
             members: [
                 { name: 'Kenan', roleKey: 'roleAdmin' },
-                { name: 'Enes', roleKey: 'roleFinance' },
-                { name: 'Julie', roleKey: 'roleExec', italic: true }
+                { name: 'Enes', roleKey: 'roleFinance' }
             ]
         },
         {
@@ -58,12 +57,15 @@ export const ORG: { lead: OrgPerson; branches: OrgBranch[] } = {
                 { name: 'Damien', roleKey: 'rolePm' },
                 { name: 'Laurent', roleKey: 'rolePm' },
                 { name: 'Ajla', roleKey: 'rolePm' },
-                { name: 'Tariq', roleKey: 'rolePm' },
-                { name: 'Thiago', roleKey: 'roleInstall', badgeKey: 'orgInstallers' }
+                { name: 'Tarik', roleKey: 'rolePm' },
+                { name: 'Tiago', roleKey: 'roleInstall', badgeKey: 'orgInstallers' }
             ],
             department: {
-                name: 'Interior Architecture Office by PortMix',
-                members: ['Ensara', 'Elyna']
+                name: 'Studio PortMix',
+                members: [
+                    { name: 'Ensara', roleKey: 'roleClientCare' },
+                    { name: 'Elyna', roleKey: 'roleInterior' }
+                ]
             }
         }
     ]

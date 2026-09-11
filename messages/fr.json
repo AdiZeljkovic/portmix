@@ -140,11 +140,11 @@
         "roleTechDev": "Directeur technique & responsable du développement",
         "roleAdmin": "Assistant administratif",
         "roleFinance": "Analyste financier",
-        "roleExec": "Assistante de direction",
         "rolePm": "Chef de projet",
         "roleInstall": "Responsable de pose",
         "orgInstallers": "10 poseurs",
-        "orgNote": "Elma et Naseem rapportent directement à Nasuf. « Interior Architecture Office by PortMix » est un département à part entière au sein de l'équipe de Naseem."
+        "roleClientCare": "Chargée de clientèle",
+        "roleInterior": "Architecte d'intérieur"
     },
     "services": {
         "kicker": "Nos services",

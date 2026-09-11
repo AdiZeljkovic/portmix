@@ -98,6 +98,22 @@
   .seg button{flex:1;border:0;background:transparent;border-radius:8px;padding:7px 5px;
     font-size:11.5px;font-weight:600;color:var(--ink-3);transition:.15s;white-space:nowrap}
   .seg button:hover{color:var(--ink)}
+  #panelGrupa[hidden]{display:none}
+  .panel-hint{margin:0 0 8px;font-size:12px;line-height:1.5;color:var(--muted)}
+  #panelFoto{width:100%;font-size:13px}
+  .panel-rijeci{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+  .panel-rijeci input{text-transform:uppercase;letter-spacing:.06em;font-size:13px}
+  /* Canvas je 800×908, prikazuje se uklopljen u kolonu — omjer ostaje isti. */
+  #panelCanvas{width:100%;height:auto;margin-top:10px;border-radius:10px;
+    border:1px solid var(--line);background:#1a1a1e;display:block}
+  .panel-akcije{display:flex;gap:8px;margin-top:10px}
+  .panel-save{flex:1;border:0;border-radius:9px;padding:9px 12px;font-size:13px;
+    font-weight:700;color:#fff;background:var(--accent,#ED1C24);cursor:pointer}
+  .panel-save:disabled{opacity:.45;cursor:default}
+  .panel-reset{border:1px solid var(--line);background:#fff;border-radius:9px;
+    padding:9px 12px;font-size:13px;color:var(--muted);cursor:pointer}
+  .panel-status{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--muted);min-height:18px}
+  .panel-status.bad{color:#b3261e}
   .seg button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(60,44,26,.13)}
 
   .toggle{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;
@@ -234,16 +250,33 @@
           <div class="group-title" id="formatTitle"></div>
           <div class="field"><label id="sizeLabel"></label>
             <div class="seg" id="sizeSeg">
-              <button type="button" data-size="compact" class="active"></button>
-              <button type="button" data-size="standard"></button>
+              <button type="button" data-size="compact"></button>
+              <button type="button" data-size="standard" class="active"></button>
               <button type="button" data-size="large"></button>
             </div>
           </div>
           <div class="field"><label id="layoutLabel"></label>
             <div class="seg" id="layoutSeg">
-              <button type="button" data-layout="split" class="active"></button>
+              <button type="button" data-layout="split"></button>
               <button type="button" data-layout="stacked"></button>
+              <button type="button" data-layout="panel" class="active"></button>
             </div>
+          </div>
+          <div class="field" id="panelGrupa" hidden>
+            <label id="panelLabel"></label>
+            <p class="panel-hint" id="panelHint"></p>
+            <input type="file" id="panelFoto" accept="image/*">
+            <div class="panel-rijeci">
+              <input id="rijec0" maxlength="14" value="DESIGN" aria-label="1">
+              <input id="rijec1" maxlength="14" value="PLAN" aria-label="2">
+              <input id="rijec2" maxlength="14" value="REALISE" aria-label="3">
+            </div>
+            <canvas id="panelCanvas" width="800" height="908"></canvas>
+            <div class="panel-akcije">
+              <button type="button" id="panelSaveBtn" class="panel-save" disabled></button>
+              <button type="button" id="panelResetBtn" class="panel-reset"></button>
+            </div>
+            <p class="panel-status" id="panelStatus"></p>
           </div>
           <div class="field"><label id="iconModeLabel"></label>
             <div class="seg" id="iconSeg">
@@ -347,7 +380,7 @@
 'use strict';
 
 const ASSETS = {"logo": "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", "phone": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEXfFx8AAAD8+/vpVlv8AgL6q6vnZWn0b2/yqar21NexY2PkO0Puj5J/AADnamy0Hx8AAAAAAAAAAAAAAAAAAAAl/CvBAAAAEHRSTlP8AAvkAQyiA1RHA+iVAmIDlz/xUQAAASNJREFUeNqFUwkSwyAIFBA19/9/2xU10SRtmbHTyLosl6M/5rr/emweth36ClB/3fr4APBBlFZxMAkpY0YAwy2LaybJri4AEwc3WOAaxgD+4TcENwDHpx/Gm6+ASOuLHxyxAJSmol7TDUKzAWYuyhFyjLQUADIwgp3ipiNDArvDqcwKNhlVQJ7D2euXvycjJtK3Z0x6T6SmWQF7FfMVIPxAjCHwzZM8AU0kKCb0FC3dg/QizzRzpmhMfldDIbGuUFa7ZLOFHtRC5TrgJ/QdKgNicLy1Zvlp6YoTlDkZ50qxpDnf2i1VAc/+18CgLPHXyCFnvYY2el7f/efYb5RkGLfmORcHJ5k8EVk5K7+vXlbEUza4D35d3rZukd+3Gwysquz7qw8A9gZk8A1toQAAAABJRU5ErkJggg==", "mail": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADgGSH5/ProU1j2a2v/AADuoqbnYmjfYGP4qav12NfpPEPvjpK6MjKvX19/AAAAAAAAAAAAAAAAAAAAAABG7PKvAAAAEHRSTlMA/AzmAwFYoWQDVPScAwMCp5OKuAAAASNJREFUeNp9U1u2wyAIREB8ptn/bi+KSTS1d077E3AYBgCY4DExpwQ/gHwn7nLw0H+WGCV3rq+4/ipRcc4RVc35rHFuYXeDKgIv8RODW0ACkxCvFdwb8nAgv993jrnKJt4y2Pdoglx2Ca4Oig92/bRgFMHuAHYC7QxvwKJTrCTd7mEwTwL47lG0xolEhauDQkXs2zDBCrZ3NBzP9sgNxluRlCKZXFCiTUIT1PpRk6+ybswpXPVUUtCuGF8J8fINTbVPKU0ik7VJ6/yjtclmVBeRH5tyzmRG9ZEz1k4xjWlYPdYKPdJ2WOL52jfZjTM8+3B1tcZ1j+CfjGA9PxlC7/iy1nDorMq80/A+HeVDscOp0h58395U0u8PmI/TK87j533v8AfsiwcP67QWtwAAAABJRU5ErkJggg==", "web": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADiGSH89/jmVlvmYWX1pabwnaDwnaL53N3/AAD+amrlO0Toa3B/AADjLzOxY2MAAAAAAAAAAAAAAAAAAACm4tS4AAAAEHRSTlMA+hLkpBlYnEoBBuNnAq0DcPoEMgAAAV1JREFUeNp9U4uSgyAMDHkiIP3/v70E0KptLzPOYLLZvAHuggi/RWDfALbdH1/N25thKx/m0CtQrSkRa2A+IErpFGrT5ZQCyOkmjNcwuD3tKYXytO+nvRLV9ey4H3kUhIM3nLDR+ltBXpCHF6GaEjTRRRi5TcD0cLUyUULq2KfHKEUWQbhhcoCym4ZKB4V/I6KNzwGk/tKhG+3aYEREseZsCmYIJhhhaVUx3q7pHoVb6tkVAjPNE8A5WJzf6cATcOADEB6SJsAV8ARQMMBkEFe0a4jx9swUtYgIoLTpVdceWQAaAqt2tg7KnOVd5mpUxdEBDwErytGoo9XsiNHJDGkOo85WO0DX9DiGxcbY0jVFeK3pkTtgxpzn8HxWx0KcC0NkBmtj3C7/rRzl63mU/Ym428da23XtfaLl43DQwIuMvbUctX05La9BNedYkm83jGU/Asqv+0b0YeHtLP8APjkIe//1vPUAAAAASUVORK5CYII=", "location": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAP1BMVEUAAADgGCD7+fnoUFX7AwP4bGzumJvmY2r0pKXmOkL319axZGTkbG7ujY9/AAC0Hx8AAAAAAAAAAAAAAAAAAADLQ/x8AAAAEHRSTlMA/A/fAQVSoxLvRANilgIDmqjdDAAAAS1JREFUeNp1U4uyhSAIRMBnVv//t5dCKL0dZpwRWRaUFeBljCXGUuCHYXTgFwZPWS31ntrNtcYlG3eiGkIg2gWzrXEJBzfaEeLED5jDZNTg1UiBRmExSg8HM1i8kiOpOCIaPyVpHtPAEB6K2CDZiXWkfgYeAE2pd3pH6XhwyE47rJqAHEnrFAXczyOrq1ssE3BstEaEbB2gIhOMojRuQQ6gQWXXngAhRewzcgFcFWVeGQ+79wIIEpH+nq4GQBq1x8VNHI5OQGPS5oeuD4c1WNGoo7aDoPPxeSUTi2uB8CyPMuqQVeHmFBmegkKwGcXuh3vzbcbN9f4SHD3xg11S/yR5TWySPmOvU/ya/SRrhkT1rVhYv47Ua10/DiT1FyuvI/7+wOU8WOw4f/7vL/sD8wUHHo+RExsAAAAASUVORK5CYII=", "logoHelvetique": "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"};
-const I18N = {"bs": {"docTitle": "Signature Studio", "brandSubtitle": "Profesionalan, čist i jednostavan generator poslovnih potpisa", "language": "Jezik", "reset": "Vrati početno", "copyMobile": "Kopiraj mobilni tekst", "viewHtml": "Prikaži HTML", "hideHtml": "Sakrij HTML", "copySignature": "Kopiraj potpis", "downloadHtml": "Preuzmi HTML", "editor": "Uređivanje", "signatureDetails": "Podaci potpisa", "identity": "Identitet", "fullName": "Ime i prezime", "jobTitle": "Pozicija", "company": "Kompanija", "contact": "Kontakt", "phone": "Telefon", "email": "E-mail", "website": "Web stranica", "address": "Lokacija / adresa", "mapLink": "Link mape <small>opcionalno</small>", "brand": "Brend", "accent": "Akcentna boja", "tagline": "Donja linija / slogan", "logoUrl": "URL hostovanog logotipa <small>preporučeno</small>", "options": "Opcije", "showCompany": "Prikaži kompaniju", "showCompanyDesc": "Prikazuje “PortMix SA” ispod pozicije.", "showLocation": "Prikaži lokaciju", "showLocationDesc": "Korisno za lokalnu komunikaciju sa klijentima.", "showTagline": "Prikaži slogan", "showTaglineDesc": "Dodaje tanku donju liniju iz odobrenog dizajna.", "livePreview": "Pregled uživo", "desktopPreview": "Pregled e-maila na računaru", "phonePreview": "Pregled širine telefona", "desktop": "Računar", "phoneBtn": "Telefon", "message": "Poštovani,<br><br>Hvala na poruci. Moje kontakt podatke možete pronaći ispod.<br><br>Srdačan pozdrav,", "generatedHtml": "Generisani HTML prilagođen e-mail klijentima", "copyCode": "Kopiraj kod", "installation": "Instalacija", "installationTitle": "Kako instalirati generisani potpis", "guidance": "Upute provjerene prema zvaničnoj dokumentaciji podrške • august 2026.", "deployment": "<strong>Preporučeno postavljanje:</strong> uploadujte <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> i četiri PNG ikonice u isti HTTPS folder kao ovaj generator (npr. <b>/signature/</b>). Generator ih tada automatski koristi umjesto ugrađenog base64 koda, pa potpis ostaje mali i brzo se učitava.", "bestPractice": "<strong>Preporuka:</strong> nakon instalacije pošaljite testni e-mail iz Outlooka, Gmaila i sa telefona na Gmail i Outlook adresu. Provjerite učitavanje logotipa, linkove, razmake i izgled odgovora. Neki primaoci ili kompanijske sigurnosne postavke blokiraju automatsko učitavanje vanjskih slika; to je postavka e-mail klijenta, a ne greška potpisa.", "source": "Potpis koristi prezentacijske tabele, inline CSS, web-sigurne fontove, fiksne širine kolona, mso-line-height-rule za Outlook i dodatno stilizovane linkove. Prazna polja se automatski izostavljaju iz rasporeda. JavaScript se koristi samo u generatoru, nikad u samom potpisu.", "footer": "Signature Studio · Samostalni HTML generator · Uređivanje i generisanje se odvijaju lokalno u pregledniku.", "logoHosted": "<strong>Hostovani logo:</strong> potpis koristi vaš javni HTTPS URL — najbolje za Gmail i Outlook.", "logoPackage": "<strong>Logo iz paketa:</strong> generator koristi <b>portmix-signature-logo.png</b> iz istog foldera. Ovo je najlakši i najlakši za održavanje način.", "logoOffline": "<strong>Offline logo:</strong> logo je ugrađen kao base64 da generator radi lokalno. Ovo povećava veličinu koda — za produkciju uploadujte PNG fajlove na HTTPS folder ili unesite URL logotipa iznad.", "toastSignature": "Potpis je kopiran — zalijepite ga u svoj e-mail klijent.", "toastBlocked": "Preglednik je blokirao automatsko kopiranje. Otvorite “Prikaži HTML” ili ručno označite pregled potpisa.", "toastMobile": "Mobilna tekstualna verzija je kopirana.", "toastCode": "HTML kod je kopiran.", "toastDownloaded": "HTML potpisa je preuzet.", "toastReset": "Početne vrijednosti su vraćene.", "emailSignatureTitle": "E-mail potpis", "defaultTitle": "Osnivač i direktor", "defaultTagline": "PAMETNA RJEŠENJA. SNAŽNIJE VEZE.", "guides": [{"tag": "Gmail · Web", "title": "Puni vizualni potpis", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b> iznad.</li><li>U Gmailu otvorite <b>Postavke → Prikaži sve postavke</b>.</li><li>U dijelu <b>Općenito → Potpis</b> kreirajte novi potpis.</li><li>Kliknite u editor potpisa i zalijepite sadržaj.</li><li>Odaberite zadani potpis za nove poruke i odgovore/prosljeđivanja.</li><li>Na dnu kliknite <b>Sačuvaj promjene</b>.</li></ol>", "link": "Zvanične Gmail upute ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Novi / Web", "title": "Preporučeno Microsoft podešavanje", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite Outlook <b>Postavke → Računi → Potpisi</b>.</li><li>Odaberite odgovarajući račun i kliknite <b>Dodaj potpis</b>.</li><li>Zalijepite potpis u editor.</li><li>Odaberite da li se koristi za nove poruke i odgovore/prosljeđivanja.</li><li>Kliknite <b>Sačuvaj</b>.</li></ol>", "link": "Zvanične Outlook upute ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Klasični desktop Outlook", "html": "<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite <b>Novi e-mail → Poruka → Potpis → Potpisi</b>.</li><li>Odaberite <b>Novi</b>, dodijelite naziv potpisu i zalijepite ga u <b>Uredi potpis</b>.</li><li>Odaberite zadani potpis za nove poruke i, po želji, odgovore/prosljeđivanja.</li><li>Sačuvajte klikom na <b>OK</b>.</li></ol><p>Microsoft podržava kopirane predloške, tabele, linkove i slike u klasičnim Outlook potpisima.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Zadržite desktop potpis", "html": "<p>Ako u Gmail mobilnoj aplikaciji <b>ne napravite Mobile Signature</b>, nove poruke koriste potpis podešen na računaru.</p><ol><li>Prvo instalirajte puni potpis u Gmailu na webu.</li><li>U Gmail aplikaciji ostavite <b>Mobile Signature</b> nepodešen/isključen.</li><li>Pošaljite testnu poruku sa telefona.</li></ol>", "link": "Zvanične Gmail mobilne upute ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobilna zamjenska verzija", "html": "<p>Outlook mobilna aplikacija ima polje za potpis po računu u <b>Postavke → Mail → Potpis</b>. Za siguran rezultat koristite dugme <b>Kopiraj mobilni tekst</b>.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>U Outlook aplikaciji otvorite <b>Postavke → Mail → Potpis</b>.</li><li>Po potrebi uključite <b>Potpis po računu</b>.</li><li>Zalijepite tekst i sačuvajte.</li></ol>", "link": "Zvanične Outlook mobilne upute ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Tekstualna verzija za Apple Mail", "html": "<p>Appleova iPhone dokumentacija navodi da su potpisi u Mail postavkama <b>samo tekstualni</b>. Koristite mobilnu tekstualnu verziju umjesto punog vizualnog potpisa.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>Otvorite <b>Postavke → Aplikacije → Mail → Potpis</b>.</li><li>Po potrebi odaberite <b>Po računu</b>.</li><li>Zalijepite tekstualni potpis.</li></ol>", "link": "Zvanične Apple upute ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobitel <small>opcionalno</small>", "format": "Format potpisa", "size": "Veličina", "sizeCompact": "Kompaktna", "sizeStandard": "Standardna", "sizeLarge": "Velika", "layout": "Raspored", "layoutSplit": "Logo lijevo", "layoutStacked": "Logo iznad", "iconMode": "Ikone", "iconImages": "Slike", "iconLabels": "Oznake (T/E/W)", "iconNone": "Bez ikona", "sizeMeter": "Veličina koda: {n} znakova", "sizeOk": "Prolazi kroz Gmail", "sizeNear": "Blizu Gmail limita", "sizeOver": "Prelazi Gmail limit (10.000)", "previewNote": "Pregled prikazuje stvarnu širinu e-mail prozora", "studioTag": "PortMix · Helvetique", "toastBrand": "Profil firme: {n}"}, "en": {"docTitle": "Signature Studio", "brandSubtitle": "Professional, clean and client-friendly signature builder", "language": "Language", "reset": "Reset", "copyMobile": "Copy mobile text", "viewHtml": "View HTML", "hideHtml": "Hide HTML", "copySignature": "Copy signature", "downloadHtml": "Download HTML", "editor": "Editor", "signatureDetails": "Signature details", "identity": "Identity", "fullName": "Full name", "jobTitle": "Job title", "company": "Company", "contact": "Contact", "phone": "Phone", "email": "Email", "website": "Website", "address": "Location / address", "mapLink": "Map link <small>optional</small>", "brand": "Brand", "accent": "Accent color", "tagline": "Bottom line / slogan", "logoUrl": "Hosted logo URL <small>recommended</small>", "options": "Options", "showCompany": "Show company line", "showCompanyDesc": "Displays “PortMix SA” under the job title.", "showLocation": "Show location", "showLocationDesc": "Useful for local client communication.", "showTagline": "Show tagline", "showTaglineDesc": "Creates the thin footer line from the approved concept.", "livePreview": "Live preview", "desktopPreview": "Desktop email preview", "phonePreview": "Phone-width preview", "desktop": "Desktop", "phoneBtn": "Phone", "message": "Hello,<br><br>Thank you for your message. You can find my contact details below.<br><br>Kind regards,", "generatedHtml": "Generated email-safe HTML", "copyCode": "Copy code", "installation": "Installation", "installationTitle": "How to install the generated signature", "guidance": "Guidance verified against official support documentation • Aug 2026", "deployment": "<strong>Recommended deployment:</strong> upload <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> and the four PNG icons into the same HTTPS folder as this generator (for example <b>/signature/</b>). The generator then links to them instead of embedding base64, keeping the signature small and fast to load.", "bestPractice": "<strong>Best practice:</strong> after installing, send test emails from Outlook, Gmail and the phone to both a Gmail inbox and an Outlook inbox. Check logo loading, links, spacing and reply behaviour. Some recipients or corporate policies block automatic external image downloads; that is a mail-client security setting, not a broken signature.", "source": "The signature uses presentation tables, inline CSS, web-safe fonts, fixed column widths, mso-line-height-rule for Outlook and link-safe inline styling. Empty fields are dropped from the layout automatically. JavaScript is used only by the generator, never inside the signature.", "footer": "Signature Studio · Standalone HTML generator · All editing and generation happens locally in the browser.", "logoHosted": "<strong>Hosted logo:</strong> the signature uses your public HTTPS URL — best for Gmail and Outlook.", "logoPackage": "<strong>Package logo:</strong> the generator uses <b>portmix-signature-logo.png</b> from this same folder. This is the easiest setup to maintain.", "logoOffline": "<strong>Offline logo:</strong> the logo is embedded as base64 so the generator works locally. This inflates the code size — for production, upload the PNG files to an HTTPS folder or paste a hosted logo URL above.", "toastSignature": "Signature copied — paste it into your email client.", "toastBlocked": "Browser blocked automatic copy. Use “View HTML” or select the preview manually.", "toastMobile": "Mobile text signature copied.", "toastCode": "HTML source copied.", "toastDownloaded": "Signature HTML downloaded.", "toastReset": "Defaults restored.", "emailSignatureTitle": "Email Signature", "defaultTitle": "Founder & Managing Director", "defaultTagline": "SMART SOLUTIONS. STRONGER CONNECTIONS.", "guides": [{"tag": "Gmail · Web", "title": "Full visual signature", "html": "<ol><li>Click <b>Copy signature</b> above.</li><li>In Gmail open <b>Settings → See all settings</b>.</li><li>Under <b>General → Signature</b>, create a new signature.</li><li>Click inside the signature editor and paste.</li><li>Choose defaults for new emails and replies/forwards.</li><li>Scroll down and click <b>Save Changes</b>.</li></ol>", "link": "Official Gmail instructions ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · New / Web", "title": "Recommended Microsoft setup", "html": "<ol><li>Click <b>Copy signature</b>.</li><li>Open Outlook <b>Settings → Accounts → Signatures</b>.</li><li>Select the correct account and choose <b>Add signature</b>.</li><li>Paste into the signature editor.</li><li>Choose whether it applies to new messages and replies/forwards.</li><li>Click <b>Save</b>.</li></ol>", "link": "Official Outlook instructions ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Classic desktop Outlook", "html": "<ol><li>Click <b>Copy signature</b>.</li><li>Open <b>New Email → Message → Signature → Signatures</b>.</li><li>Choose <b>New</b>, name the signature, then paste it in <b>Edit signature</b>.</li><li>Select the default signature for new messages and, if desired, replies/forwards.</li><li>Save with <b>OK</b>.</li></ol><p>Microsoft supports copied templates, tables, links and images in classic Outlook signatures.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Keep the desktop signature", "html": "<p>If you <b>do not create a Mobile Signature</b> in the Gmail app, new messages use the signature configured on the computer.</p><ol><li>Install the full signature in Gmail on the web first.</li><li>In the Gmail mobile app, leave <b>Mobile Signature</b> unset/off.</li><li>Send a test message from the phone.</li></ol>", "link": "Official Gmail mobile instructions ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobile fallback", "html": "<p>Outlook mobile provides a per-account signature field under <b>Settings → Mail → Signature</b>. For a dependable result, use the generator's <b>Copy mobile text</b> button.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>In Outlook mobile open <b>Settings → Mail → Signature</b>.</li><li>Enable <b>Per Account Signature</b> if needed.</li><li>Paste and save.</li></ol>", "link": "Official Outlook mobile instructions ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Text-only Apple Mail version", "html": "<p>Apple's current iPhone documentation says Mail signatures in Settings are <b>text only</b>. Use the generator's mobile text version instead of the full visual layout.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>Open <b>Settings → Apps → Mail → Signature</b>.</li><li>Choose <b>Per Account</b> if needed.</li><li>Paste the text signature.</li></ol>", "link": "Official Apple instructions ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobile <small>optional</small>", "format": "Signature format", "size": "Size", "sizeCompact": "Compact", "sizeStandard": "Standard", "sizeLarge": "Large", "layout": "Layout", "layoutSplit": "Logo left", "layoutStacked": "Logo on top", "iconMode": "Icons", "iconImages": "Images", "iconLabels": "Labels (T/E/W)", "iconNone": "No icons", "sizeMeter": "Code size: {n} characters", "sizeOk": "Fits Gmail", "sizeNear": "Close to Gmail limit", "sizeOver": "Over Gmail limit (10,000)", "previewNote": "Preview shows a real email window width", "studioTag": "PortMix · Helvetique", "toastBrand": "Company profile: {n}"}, "de": {"docTitle": "Signature Studio", "brandSubtitle": "Professioneller, klarer und kundenfreundlicher Signatur-Generator", "language": "Sprache", "reset": "Zurücksetzen", "copyMobile": "Mobiltext kopieren", "viewHtml": "HTML anzeigen", "hideHtml": "HTML ausblenden", "copySignature": "Signatur kopieren", "downloadHtml": "HTML herunterladen", "editor": "Editor", "signatureDetails": "Signaturdaten", "identity": "Identität", "fullName": "Vor- und Nachname", "jobTitle": "Position", "company": "Unternehmen", "contact": "Kontakt", "phone": "Telefon", "email": "E-Mail", "website": "Webseite", "address": "Standort / Adresse", "mapLink": "Kartenlink <small>optional</small>", "brand": "Marke", "accent": "Akzentfarbe", "tagline": "Unterzeile / Slogan", "logoUrl": "URL des gehosteten Logos <small>empfohlen</small>", "options": "Optionen", "showCompany": "Unternehmenszeile anzeigen", "showCompanyDesc": "Zeigt „PortMix SA“ unter der Position an.", "showLocation": "Standort anzeigen", "showLocationDesc": "Nützlich für die lokale Kundenkommunikation.", "showTagline": "Slogan anzeigen", "showTaglineDesc": "Fügt die feine Abschlusslinie aus dem freigegebenen Entwurf hinzu.", "livePreview": "Live-Vorschau", "desktopPreview": "E-Mail-Vorschau am Desktop", "phonePreview": "Vorschau in Smartphone-Breite", "desktop": "Desktop", "phoneBtn": "Smartphone", "message": "Guten Tag,<br><br>vielen Dank für Ihre Nachricht. Meine Kontaktdaten finden Sie unten.<br><br>Freundliche Grüße,", "generatedHtml": "Generiertes, E-Mail-kompatibles HTML", "copyCode": "Code kopieren", "installation": "Installation", "installationTitle": "So installieren Sie die generierte Signatur", "guidance": "Anleitung anhand offizieller Support-Dokumentation geprüft • August 2026", "deployment": "<strong>Empfohlene Bereitstellung:</strong> Laden Sie <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> und die vier PNG-Symbole in denselben HTTPS-Ordner wie diesen Generator hoch (z. B. <b>/signature/</b>). Der Generator verlinkt sie dann, statt base64 einzubetten — die Signatur bleibt klein und lädt schnell.", "bestPractice": "<strong>Empfehlung:</strong> Senden Sie nach der Installation Test-E-Mails aus Outlook, Gmail und vom Smartphone an ein Gmail- und ein Outlook-Postfach. Prüfen Sie Logo, Links, Abstände und das Verhalten bei Antworten. Manche Empfänger oder Unternehmensrichtlinien blockieren externe Bilder automatisch; das ist eine Sicherheitseinstellung des E-Mail-Clients und kein Fehler der Signatur.", "source": "Die Signatur verwendet Präsentationstabellen, Inline-CSS, websichere Schriften, feste Spaltenbreiten, mso-line-height-rule für Outlook und link-sichere Inline-Stile. Leere Felder werden automatisch aus dem Layout entfernt. JavaScript wird nur im Generator verwendet, nie in der Signatur.", "footer": "Signature Studio · Eigenständiger HTML-Generator · Bearbeitung und Generierung erfolgen lokal im Browser.", "logoHosted": "<strong>Gehostetes Logo:</strong> Die Signatur nutzt Ihre öffentliche HTTPS-URL — am besten für Gmail und Outlook.", "logoPackage": "<strong>Logo aus dem Paket:</strong> Der Generator verwendet <b>portmix-signature-logo.png</b> aus demselben Ordner. Das ist die einfachste Variante.", "logoOffline": "<strong>Offline-Logo:</strong> Das Logo ist als base64 eingebettet, damit der Generator lokal funktioniert. Das vergrößert den Code — laden Sie für den Produktivbetrieb die PNG-Dateien in einen HTTPS-Ordner hoch oder tragen Sie oben eine Logo-URL ein.", "toastSignature": "Signatur kopiert — fügen Sie sie in Ihren E-Mail-Client ein.", "toastBlocked": "Der Browser hat das automatische Kopieren blockiert. Verwenden Sie „HTML anzeigen“ oder markieren Sie die Vorschau manuell.", "toastMobile": "Mobile Textsignatur kopiert.", "toastCode": "HTML-Code kopiert.", "toastDownloaded": "Signatur-HTML heruntergeladen.", "toastReset": "Standardwerte wiederhergestellt.", "emailSignatureTitle": "E-Mail-Signatur", "defaultTitle": "Gründer & Geschäftsführer", "defaultTagline": "INTELLIGENTE LÖSUNGEN. STÄRKERE VERBINDUNGEN.", "guides": [{"tag": "Gmail · Web", "title": "Vollständige visuelle Signatur", "html": "<ol><li>Klicken Sie oben auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie in Gmail <b>Einstellungen → Alle Einstellungen aufrufen</b>.</li><li>Erstellen Sie unter <b>Allgemein → Signatur</b> eine neue Signatur.</li><li>Klicken Sie in den Signatur-Editor und fügen Sie den Inhalt ein.</li><li>Legen Sie die Standards für neue E-Mails sowie Antworten/Weiterleitungen fest.</li><li>Scrollen Sie nach unten und klicken Sie auf <b>Änderungen speichern</b>.</li></ol>", "link": "Offizielle Gmail-Anleitung ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Neu / Web", "title": "Empfohlene Microsoft-Einrichtung", "html": "<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie Outlook <b>Einstellungen → Konten → Signaturen</b>.</li><li>Wählen Sie das richtige Konto und <b>Signatur hinzufügen</b>.</li><li>Fügen Sie die Signatur in den Editor ein.</li><li>Wählen Sie, ob sie für neue Nachrichten und Antworten/Weiterleitungen verwendet werden soll.</li><li>Klicken Sie auf <b>Speichern</b>.</li></ol>", "link": "Offizielle Outlook-Anleitung ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Klassisches Outlook für Windows", "html": "<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie <b>Neue E-Mail → Nachricht → Signatur → Signaturen</b>.</li><li>Wählen Sie <b>Neu</b>, benennen Sie die Signatur und fügen Sie sie unter <b>Signatur bearbeiten</b> ein.</li><li>Wählen Sie die Standardsignatur für neue Nachrichten und optional für Antworten/Weiterleitungen.</li><li>Speichern Sie mit <b>OK</b>.</li></ol><p>Microsoft unterstützt kopierte Vorlagen, Tabellen, Links und Bilder in klassischen Outlook-Signaturen.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Desktop-Signatur beibehalten", "html": "<p>Wenn Sie in der Gmail-App <b>keine mobile Signatur</b> erstellen, verwenden neue Nachrichten die am Computer eingerichtete Signatur.</p><ol><li>Installieren Sie zuerst die vollständige Signatur in Gmail im Web.</li><li>Lassen Sie <b>Mobile Signatur</b> in der Gmail-App leer/deaktiviert.</li><li>Senden Sie eine Testnachricht vom Smartphone.</li></ol>", "link": "Offizielle Gmail-Mobilanleitung ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Mobile Ersatzversion", "html": "<p>Outlook Mobile bietet pro Konto ein Signaturfeld unter <b>Einstellungen → Mail → Signatur</b>. Für ein zuverlässiges Ergebnis verwenden Sie <b>Mobiltext kopieren</b>.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie in Outlook Mobile <b>Einstellungen → Mail → Signatur</b>.</li><li>Aktivieren Sie bei Bedarf <b>Signatur pro Konto</b>.</li><li>Fügen Sie den Text ein und speichern Sie.</li></ol>", "link": "Offizielle Outlook-Mobilanleitung ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Textversion für Apple Mail", "html": "<p>Laut aktueller iPhone-Dokumentation von Apple sind Mail-Signaturen in den Einstellungen <b>nur Text</b>. Verwenden Sie daher die mobile Textversion.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie <b>Einstellungen → Apps → Mail → Signatur</b>.</li><li>Wählen Sie bei Bedarf <b>Pro Account</b>.</li><li>Fügen Sie die Textsignatur ein.</li></ol>", "link": "Offizielle Apple-Anleitung ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobil <small>optional</small>", "format": "Signaturformat", "size": "Größe", "sizeCompact": "Kompakt", "sizeStandard": "Standard", "sizeLarge": "Groß", "layout": "Layout", "layoutSplit": "Logo links", "layoutStacked": "Logo oben", "iconMode": "Symbole", "iconImages": "Bilder", "iconLabels": "Kürzel (T/E/W)", "iconNone": "Ohne Symbole", "sizeMeter": "Codegröße: {n} Zeichen", "sizeOk": "Passt in Gmail", "sizeNear": "Nahe am Gmail-Limit", "sizeOver": "Über Gmail-Limit (10.000)", "previewNote": "Die Vorschau zeigt eine reale E-Mail-Fensterbreite", "studioTag": "PortMix · Helvetique", "toastBrand": "Firmenprofil: {n}"}, "fr": {"docTitle": "Signature Studio", "brandSubtitle": "Générateur de signature professionnel, épuré et simple pour le client", "language": "Langue", "reset": "Réinitialiser", "copyMobile": "Copier le texte mobile", "viewHtml": "Afficher le HTML", "hideHtml": "Masquer le HTML", "copySignature": "Copier la signature", "downloadHtml": "Télécharger le HTML", "editor": "Éditeur", "signatureDetails": "Détails de la signature", "identity": "Identité", "fullName": "Nom et prénom", "jobTitle": "Fonction", "company": "Entreprise", "contact": "Contact", "phone": "Téléphone", "email": "E-mail", "website": "Site web", "address": "Lieu / adresse", "mapLink": "Lien de carte <small>facultatif</small>", "brand": "Marque", "accent": "Couleur d’accent", "tagline": "Ligne inférieure / slogan", "logoUrl": "URL du logo hébergé <small>recommandé</small>", "options": "Options", "showCompany": "Afficher l’entreprise", "showCompanyDesc": "Affiche « PortMix SA » sous la fonction.", "showLocation": "Afficher le lieu", "showLocationDesc": "Utile pour la communication avec les clients locaux.", "showTagline": "Afficher le slogan", "showTaglineDesc": "Ajoute la fine ligne de bas de page du concept approuvé.", "livePreview": "Aperçu en direct", "desktopPreview": "Aperçu e-mail sur ordinateur", "phonePreview": "Aperçu largeur téléphone", "desktop": "Ordinateur", "phoneBtn": "Téléphone", "message": "Bonjour,<br><br>Merci pour votre message. Vous trouverez mes coordonnées ci-dessous.<br><br>Cordialement,", "generatedHtml": "HTML généré compatible avec les clients e-mail", "copyCode": "Copier le code", "installation": "Installation", "installationTitle": "Comment installer la signature générée", "guidance": "Instructions vérifiées à partir de la documentation officielle • août 2026", "deployment": "<strong>Déploiement recommandé :</strong> téléversez <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> et les quatre icônes PNG dans le même dossier HTTPS que ce générateur (par exemple <b>/signature/</b>). Le générateur y fera référence au lieu d'intégrer du base64, ce qui garde la signature légère et rapide à charger.", "bestPractice": "<strong>Bonne pratique :</strong> après l'installation, envoyez des e-mails de test depuis Outlook, Gmail et le téléphone vers une boîte Gmail et une boîte Outlook. Vérifiez le chargement du logo, les liens, les espacements et le comportement lors des réponses. Certains destinataires ou politiques d'entreprise bloquent le chargement automatique des images externes ; il s'agit d'un réglage de sécurité du client e-mail, pas d'une erreur de signature.", "source": "La signature utilise des tableaux de présentation, du CSS en ligne, des polices web sûres, des largeurs de colonnes fixes, mso-line-height-rule pour Outlook et des liens stylés en ligne. Les champs vides sont automatiquement retirés de la mise en page. JavaScript est utilisé uniquement dans le générateur, jamais dans la signature.", "footer": "Signature Studio · Générateur HTML autonome · Toute l'édition et la génération se font localement dans le navigateur.", "logoHosted": "<strong>Logo hébergé :</strong> la signature utilise votre URL HTTPS publique — idéal pour Gmail et Outlook.", "logoPackage": "<strong>Logo du package :</strong> le générateur utilise <b>portmix-signature-logo.png</b> depuis ce même dossier. C'est la configuration la plus simple à maintenir.", "logoOffline": "<strong>Logo hors ligne :</strong> le logo est intégré en base64 pour que le générateur fonctionne localement. Cela alourdit le code — en production, téléversez les fichiers PNG dans un dossier HTTPS ou saisissez une URL de logo ci-dessus.", "toastSignature": "Signature copiée — collez-la dans votre client e-mail.", "toastBlocked": "Le navigateur a bloqué la copie automatique. Utilisez « Afficher le HTML » ou sélectionnez manuellement l’aperçu.", "toastMobile": "Version texte mobile copiée.", "toastCode": "Code HTML copié.", "toastDownloaded": "HTML de la signature téléchargé.", "toastReset": "Valeurs par défaut restaurées.", "emailSignatureTitle": "Signature e-mail", "defaultTitle": "Fondateur & Directeur général", "defaultTagline": "SOLUTIONS INTELLIGENTES. DES CONNEXIONS PLUS FORTES.", "guides": [{"tag": "Gmail · Web", "title": "Signature visuelle complète", "html": "<ol><li>Cliquez sur <b>Copier la signature</b> ci-dessus.</li><li>Dans Gmail, ouvrez <b>Paramètres → Voir tous les paramètres</b>.</li><li>Dans <b>Général → Signature</b>, créez une nouvelle signature.</li><li>Cliquez dans l’éditeur de signature et collez le contenu.</li><li>Choisissez les valeurs par défaut pour les nouveaux e-mails et les réponses/transferts.</li><li>En bas de la page, cliquez sur <b>Enregistrer les modifications</b>.</li></ol>", "link": "Instructions officielles Gmail ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"}, {"tag": "Outlook · Nouveau / Web", "title": "Configuration Microsoft recommandée", "html": "<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez Outlook <b>Paramètres → Comptes → Signatures</b>.</li><li>Sélectionnez le bon compte puis <b>Ajouter une signature</b>.</li><li>Collez la signature dans l’éditeur.</li><li>Choisissez si elle doit être utilisée pour les nouveaux messages et les réponses/transferts.</li><li>Cliquez sur <b>Enregistrer</b>.</li></ol>", "link": "Instructions officielles Outlook ↗", "url": "https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"}, {"tag": "Outlook · Classic Windows", "title": "Outlook classique pour Windows", "html": "<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez <b>Nouveau message → Message → Signature → Signatures</b>.</li><li>Choisissez <b>Nouveau</b>, nommez la signature puis collez-la dans <b>Modifier la signature</b>.</li><li>Sélectionnez la signature par défaut pour les nouveaux messages et, si souhaité, les réponses/transferts.</li><li>Enregistrez avec <b>OK</b>.</li></ol><p>Microsoft prend en charge les modèles copiés, tableaux, liens et images dans les signatures Outlook classiques.</p>", "link": "", "url": ""}, {"tag": "Gmail · iPhone / Android", "title": "Conserver la signature du bureau", "html": "<p>Si vous <b>ne créez pas de signature mobile</b> dans l’application Gmail, les nouveaux messages utilisent la signature configurée sur l’ordinateur.</p><ol><li>Installez d’abord la signature complète dans Gmail sur le web.</li><li>Dans l’application Gmail, laissez <b>Signature mobile</b> non définie/désactivée.</li><li>Envoyez un message de test depuis le téléphone.</li></ol>", "link": "Instructions mobiles officielles Gmail ↗", "url": "https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"}, {"tag": "Outlook · iOS / Android", "title": "Version mobile de secours", "html": "<p>Outlook mobile propose un champ de signature par compte dans <b>Paramètres → Mail → Signature</b>. Pour un résultat fiable, utilisez le bouton <b>Copier le texte mobile</b>.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Dans Outlook mobile, ouvrez <b>Paramètres → Mail → Signature</b>.</li><li>Activez si nécessaire <b>Signature par compte</b>.</li><li>Collez le texte et enregistrez.</li></ol>", "link": "Instructions mobiles officielles Outlook ↗", "url": "https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"}, {"tag": "Apple Mail · iPhone", "title": "Version texte pour Apple Mail", "html": "<p>La documentation iPhone actuelle d’Apple indique que les signatures Mail dans Réglages sont <b>uniquement du texte</b>. Utilisez donc la version texte mobile.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Ouvrez <b>Réglages → Apps → Mail → Signature</b>.</li><li>Choisissez <b>Par compte</b> si nécessaire.</li><li>Collez la signature texte.</li></ol>", "link": "Instructions officielles Apple ↗", "url": "https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}], "mobilePhone": "Mobile <small>facultatif</small>", "format": "Format de signature", "size": "Taille", "sizeCompact": "Compacte", "sizeStandard": "Standard", "sizeLarge": "Grande", "layout": "Disposition", "layoutSplit": "Logo à gauche", "layoutStacked": "Logo en haut", "iconMode": "Icônes", "iconImages": "Images", "iconLabels": "Libellés (T/E/W)", "iconNone": "Sans icônes", "sizeMeter": "Taille du code : {n} caractères", "sizeOk": "Compatible Gmail", "sizeNear": "Proche de la limite Gmail", "sizeOver": "Dépasse la limite Gmail (10 000)", "previewNote": "L'aperçu montre une largeur réelle de fenêtre e-mail", "studioTag": "PortMix · Helvetique", "toastBrand": "Profil d'entreprise : {n}"}};
+const I18N = {"bs":{"docTitle":"Signature Studio","brandSubtitle":"Profesionalan, čist i jednostavan generator poslovnih potpisa","language":"Jezik","reset":"Vrati početno","copyMobile":"Kopiraj mobilni tekst","viewHtml":"Prikaži HTML","hideHtml":"Sakrij HTML","copySignature":"Kopiraj potpis","downloadHtml":"Preuzmi HTML","editor":"Uređivanje","signatureDetails":"Podaci potpisa","identity":"Identitet","fullName":"Ime i prezime","jobTitle":"Pozicija","company":"Kompanija","contact":"Kontakt","phone":"Telefon","email":"E-mail","website":"Web stranica","address":"Lokacija / adresa","mapLink":"Link mape <small>opcionalno</small>","brand":"Brend","accent":"Akcentna boja","tagline":"Donja linija / slogan","logoUrl":"URL hostovanog logotipa <small>preporučeno</small>","options":"Opcije","showCompany":"Prikaži kompaniju","showCompanyDesc":"Prikazuje “PortMix SA” ispod pozicije.","showLocation":"Prikaži lokaciju","showLocationDesc":"Korisno za lokalnu komunikaciju sa klijentima.","showTagline":"Prikaži slogan","showTaglineDesc":"Dodaje tanku donju liniju iz odobrenog dizajna.","livePreview":"Pregled uživo","desktopPreview":"Pregled e-maila na računaru","phonePreview":"Pregled širine telefona","desktop":"Računar","phoneBtn":"Telefon","message":"Poštovani,<br><br>Hvala na poruci. Moje kontakt podatke možete pronaći ispod.<br><br>Srdačan pozdrav,","generatedHtml":"Generisani HTML prilagođen e-mail klijentima","copyCode":"Kopiraj kod","installation":"Instalacija","installationTitle":"Kako instalirati generisani potpis","guidance":"Upute provjerene prema zvaničnoj dokumentaciji podrške • august 2026.","deployment":"<strong>Preporučeno postavljanje:</strong> uploadujte <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> i četiri PNG ikonice u isti HTTPS folder kao ovaj generator (npr. <b>/signature/</b>). Generator ih tada automatski koristi umjesto ugrađenog base64 koda, pa potpis ostaje mali i brzo se učitava.","bestPractice":"<strong>Preporuka:</strong> nakon instalacije pošaljite testni e-mail iz Outlooka, Gmaila i sa telefona na Gmail i Outlook adresu. Provjerite učitavanje logotipa, linkove, razmake i izgled odgovora. Neki primaoci ili kompanijske sigurnosne postavke blokiraju automatsko učitavanje vanjskih slika; to je postavka e-mail klijenta, a ne greška potpisa.","source":"Potpis koristi prezentacijske tabele, inline CSS, web-sigurne fontove, fiksne širine kolona, mso-line-height-rule za Outlook i dodatno stilizovane linkove. Prazna polja se automatski izostavljaju iz rasporeda. JavaScript se koristi samo u generatoru, nikad u samom potpisu.","footer":"Signature Studio · Samostalni HTML generator · Uređivanje i generisanje se odvijaju lokalno u pregledniku.","logoHosted":"<strong>Hostovani logo:</strong> potpis koristi vaš javni HTTPS URL — najbolje za Gmail i Outlook.","logoPackage":"<strong>Logo iz paketa:</strong> generator koristi <b>portmix-signature-logo.png</b> iz istog foldera. Ovo je najlakši i najlakši za održavanje način.","logoOffline":"<strong>Offline logo:</strong> logo je ugrađen kao base64 da generator radi lokalno. Ovo povećava veličinu koda — za produkciju uploadujte PNG fajlove na HTTPS folder ili unesite URL logotipa iznad.","toastSignature":"Potpis je kopiran — zalijepite ga u svoj e-mail klijent.","toastBlocked":"Preglednik je blokirao automatsko kopiranje. Otvorite “Prikaži HTML” ili ručno označite pregled potpisa.","toastMobile":"Mobilna tekstualna verzija je kopirana.","toastCode":"HTML kod je kopiran.","toastDownloaded":"HTML potpisa je preuzet.","toastReset":"Početne vrijednosti su vraćene.","emailSignatureTitle":"E-mail potpis","defaultTitle":"Osnivač i direktor","defaultTagline":"PAMETNA RJEŠENJA. SNAŽNIJE VEZE.","guides":[{"tag":"Gmail · Web","title":"Puni vizualni potpis","html":"<ol><li>Kliknite <b>Kopiraj potpis</b> iznad.</li><li>U Gmailu otvorite <b>Postavke → Prikaži sve postavke</b>.</li><li>U dijelu <b>Općenito → Potpis</b> kreirajte novi potpis.</li><li>Kliknite u editor potpisa i zalijepite sadržaj.</li><li>Odaberite zadani potpis za nove poruke i odgovore/prosljeđivanja.</li><li>Na dnu kliknite <b>Sačuvaj promjene</b>.</li></ol>","link":"Zvanične Gmail upute ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"},{"tag":"Outlook · Novi / Web","title":"Preporučeno Microsoft podešavanje","html":"<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite Outlook <b>Postavke → Računi → Potpisi</b>.</li><li>Odaberite odgovarajući račun i kliknite <b>Dodaj potpis</b>.</li><li>Zalijepite potpis u editor.</li><li>Odaberite da li se koristi za nove poruke i odgovore/prosljeđivanja.</li><li>Kliknite <b>Sačuvaj</b>.</li></ol>","link":"Zvanične Outlook upute ↗","url":"https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"},{"tag":"Outlook · Classic Windows","title":"Klasični desktop Outlook","html":"<ol><li>Kliknite <b>Kopiraj potpis</b>.</li><li>Otvorite <b>Novi e-mail → Poruka → Potpis → Potpisi</b>.</li><li>Odaberite <b>Novi</b>, dodijelite naziv potpisu i zalijepite ga u <b>Uredi potpis</b>.</li><li>Odaberite zadani potpis za nove poruke i, po želji, odgovore/prosljeđivanja.</li><li>Sačuvajte klikom na <b>OK</b>.</li></ol><p>Microsoft podržava kopirane predloške, tabele, linkove i slike u klasičnim Outlook potpisima.</p>","link":"","url":""},{"tag":"Gmail · iPhone / Android","title":"Zadržite desktop potpis","html":"<p>Ako u Gmail mobilnoj aplikaciji <b>ne napravite Mobile Signature</b>, nove poruke koriste potpis podešen na računaru.</p><ol><li>Prvo instalirajte puni potpis u Gmailu na webu.</li><li>U Gmail aplikaciji ostavite <b>Mobile Signature</b> nepodešen/isključen.</li><li>Pošaljite testnu poruku sa telefona.</li></ol>","link":"Zvanične Gmail mobilne upute ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"},{"tag":"Outlook · iOS / Android","title":"Mobilna zamjenska verzija","html":"<p>Outlook mobilna aplikacija ima polje za potpis po računu u <b>Postavke → Mail → Potpis</b>. Za siguran rezultat koristite dugme <b>Kopiraj mobilni tekst</b>.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>U Outlook aplikaciji otvorite <b>Postavke → Mail → Potpis</b>.</li><li>Po potrebi uključite <b>Potpis po računu</b>.</li><li>Zalijepite tekst i sačuvajte.</li></ol>","link":"Zvanične Outlook mobilne upute ↗","url":"https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"},{"tag":"Apple Mail · iPhone","title":"Tekstualna verzija za Apple Mail","html":"<p>Appleova iPhone dokumentacija navodi da su potpisi u Mail postavkama <b>samo tekstualni</b>. Koristite mobilnu tekstualnu verziju umjesto punog vizualnog potpisa.</p><ol><li>Kliknite <b>Kopiraj mobilni tekst</b>.</li><li>Otvorite <b>Postavke → Aplikacije → Mail → Potpis</b>.</li><li>Po potrebi odaberite <b>Po računu</b>.</li><li>Zalijepite tekstualni potpis.</li></ol>","link":"Zvanične Apple upute ↗","url":"https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}],"mobilePhone":"Mobitel <small>opcionalno</small>","format":"Format potpisa","size":"Veličina","sizeCompact":"Kompaktna","sizeStandard":"Standardna","sizeLarge":"Velika","layout":"Raspored","layoutSplit":"Logo lijevo","layoutStacked":"Logo iznad","layoutPanel":"Panel sa slikom","iconMode":"Ikone","iconImages":"Slike","iconLabels":"Oznake (T/E/W)","iconNone":"Bez ikona","sizeMeter":"Veličina koda: {n} znakova","sizeOk":"Prolazi kroz Gmail","sizeNear":"Blizu Gmail limita","sizeOver":"Prelazi Gmail limit (10.000)","previewNote":"Pregled prikazuje stvarnu širinu e-mail prozora","studioTag":"PortMix · Helvetique","toastBrand":"Profil firme: {n}","panelLabel":"Slika panela","panelHint":"Izaberi fotografiju i upiši tri riječi. Slika se sastavlja ovdje, pa se snima na server — potpis onda koristi tvoju.","panelSave":"Sačuvaj sliku","panelReset":"Vrati tvorničku","panelSaving":"Snimam…","panelSaved":"Snimljeno. Potpis sada koristi tvoju sliku.","panelFailed":"Snimanje nije prošlo — pokušaj ponovo.","panelNotImage":"To nije slika.","panelTooBig":"Slika je prevelika (najviše 8 MB)."},"en":{"docTitle":"Signature Studio","brandSubtitle":"Professional, clean and client-friendly signature builder","language":"Language","reset":"Reset","copyMobile":"Copy mobile text","viewHtml":"View HTML","hideHtml":"Hide HTML","copySignature":"Copy signature","downloadHtml":"Download HTML","editor":"Editor","signatureDetails":"Signature details","identity":"Identity","fullName":"Full name","jobTitle":"Job title","company":"Company","contact":"Contact","phone":"Phone","email":"Email","website":"Website","address":"Location / address","mapLink":"Map link <small>optional</small>","brand":"Brand","accent":"Accent color","tagline":"Bottom line / slogan","logoUrl":"Hosted logo URL <small>recommended</small>","options":"Options","showCompany":"Show company line","showCompanyDesc":"Displays “PortMix SA” under the job title.","showLocation":"Show location","showLocationDesc":"Useful for local client communication.","showTagline":"Show tagline","showTaglineDesc":"Creates the thin footer line from the approved concept.","livePreview":"Live preview","desktopPreview":"Desktop email preview","phonePreview":"Phone-width preview","desktop":"Desktop","phoneBtn":"Phone","message":"Hello,<br><br>Thank you for your message. You can find my contact details below.<br><br>Kind regards,","generatedHtml":"Generated email-safe HTML","copyCode":"Copy code","installation":"Installation","installationTitle":"How to install the generated signature","guidance":"Guidance verified against official support documentation • Aug 2026","deployment":"<strong>Recommended deployment:</strong> upload <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> and the four PNG icons into the same HTTPS folder as this generator (for example <b>/signature/</b>). The generator then links to them instead of embedding base64, keeping the signature small and fast to load.","bestPractice":"<strong>Best practice:</strong> after installing, send test emails from Outlook, Gmail and the phone to both a Gmail inbox and an Outlook inbox. Check logo loading, links, spacing and reply behaviour. Some recipients or corporate policies block automatic external image downloads; that is a mail-client security setting, not a broken signature.","source":"The signature uses presentation tables, inline CSS, web-safe fonts, fixed column widths, mso-line-height-rule for Outlook and link-safe inline styling. Empty fields are dropped from the layout automatically. JavaScript is used only by the generator, never inside the signature.","footer":"Signature Studio · Standalone HTML generator · All editing and generation happens locally in the browser.","logoHosted":"<strong>Hosted logo:</strong> the signature uses your public HTTPS URL — best for Gmail and Outlook.","logoPackage":"<strong>Package logo:</strong> the generator uses <b>portmix-signature-logo.png</b> from this same folder. This is the easiest setup to maintain.","logoOffline":"<strong>Offline logo:</strong> the logo is embedded as base64 so the generator works locally. This inflates the code size — for production, upload the PNG files to an HTTPS folder or paste a hosted logo URL above.","toastSignature":"Signature copied — paste it into your email client.","toastBlocked":"Browser blocked automatic copy. Use “View HTML” or select the preview manually.","toastMobile":"Mobile text signature copied.","toastCode":"HTML source copied.","toastDownloaded":"Signature HTML downloaded.","toastReset":"Defaults restored.","emailSignatureTitle":"Email Signature","defaultTitle":"Founder & Managing Director","defaultTagline":"SMART SOLUTIONS. STRONGER CONNECTIONS.","guides":[{"tag":"Gmail · Web","title":"Full visual signature","html":"<ol><li>Click <b>Copy signature</b> above.</li><li>In Gmail open <b>Settings → See all settings</b>.</li><li>Under <b>General → Signature</b>, create a new signature.</li><li>Click inside the signature editor and paste.</li><li>Choose defaults for new emails and replies/forwards.</li><li>Scroll down and click <b>Save Changes</b>.</li></ol>","link":"Official Gmail instructions ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"},{"tag":"Outlook · New / Web","title":"Recommended Microsoft setup","html":"<ol><li>Click <b>Copy signature</b>.</li><li>Open Outlook <b>Settings → Accounts → Signatures</b>.</li><li>Select the correct account and choose <b>Add signature</b>.</li><li>Paste into the signature editor.</li><li>Choose whether it applies to new messages and replies/forwards.</li><li>Click <b>Save</b>.</li></ol>","link":"Official Outlook instructions ↗","url":"https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"},{"tag":"Outlook · Classic Windows","title":"Classic desktop Outlook","html":"<ol><li>Click <b>Copy signature</b>.</li><li>Open <b>New Email → Message → Signature → Signatures</b>.</li><li>Choose <b>New</b>, name the signature, then paste it in <b>Edit signature</b>.</li><li>Select the default signature for new messages and, if desired, replies/forwards.</li><li>Save with <b>OK</b>.</li></ol><p>Microsoft supports copied templates, tables, links and images in classic Outlook signatures.</p>","link":"","url":""},{"tag":"Gmail · iPhone / Android","title":"Keep the desktop signature","html":"<p>If you <b>do not create a Mobile Signature</b> in the Gmail app, new messages use the signature configured on the computer.</p><ol><li>Install the full signature in Gmail on the web first.</li><li>In the Gmail mobile app, leave <b>Mobile Signature</b> unset/off.</li><li>Send a test message from the phone.</li></ol>","link":"Official Gmail mobile instructions ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"},{"tag":"Outlook · iOS / Android","title":"Mobile fallback","html":"<p>Outlook mobile provides a per-account signature field under <b>Settings → Mail → Signature</b>. For a dependable result, use the generator's <b>Copy mobile text</b> button.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>In Outlook mobile open <b>Settings → Mail → Signature</b>.</li><li>Enable <b>Per Account Signature</b> if needed.</li><li>Paste and save.</li></ol>","link":"Official Outlook mobile instructions ↗","url":"https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"},{"tag":"Apple Mail · iPhone","title":"Text-only Apple Mail version","html":"<p>Apple's current iPhone documentation says Mail signatures in Settings are <b>text only</b>. Use the generator's mobile text version instead of the full visual layout.</p><ol><li>Click <b>Copy mobile text</b>.</li><li>Open <b>Settings → Apps → Mail → Signature</b>.</li><li>Choose <b>Per Account</b> if needed.</li><li>Paste the text signature.</li></ol>","link":"Official Apple instructions ↗","url":"https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}],"mobilePhone":"Mobile <small>optional</small>","format":"Signature format","size":"Size","sizeCompact":"Compact","sizeStandard":"Standard","sizeLarge":"Large","layout":"Layout","layoutSplit":"Logo left","layoutStacked":"Logo on top","layoutPanel":"Image panel","iconMode":"Icons","iconImages":"Images","iconLabels":"Labels (T/E/W)","iconNone":"No icons","sizeMeter":"Code size: {n} characters","sizeOk":"Fits Gmail","sizeNear":"Close to Gmail limit","sizeOver":"Over Gmail limit (10,000)","previewNote":"Preview shows a real email window width","studioTag":"PortMix · Helvetique","toastBrand":"Company profile: {n}","panelLabel":"Panel image","panelHint":"Pick a photo and type three words. The image is composed here and saved to the server — your signature then uses yours.","panelSave":"Save image","panelReset":"Restore default","panelSaving":"Saving…","panelSaved":"Saved. Your signature now uses your image.","panelFailed":"Saving failed — please try again.","panelNotImage":"That is not an image.","panelTooBig":"The image is too large (8 MB max)."},"de":{"docTitle":"Signature Studio","brandSubtitle":"Professioneller, klarer und kundenfreundlicher Signatur-Generator","language":"Sprache","reset":"Zurücksetzen","copyMobile":"Mobiltext kopieren","viewHtml":"HTML anzeigen","hideHtml":"HTML ausblenden","copySignature":"Signatur kopieren","downloadHtml":"HTML herunterladen","editor":"Editor","signatureDetails":"Signaturdaten","identity":"Identität","fullName":"Vor- und Nachname","jobTitle":"Position","company":"Unternehmen","contact":"Kontakt","phone":"Telefon","email":"E-Mail","website":"Webseite","address":"Standort / Adresse","mapLink":"Kartenlink <small>optional</small>","brand":"Marke","accent":"Akzentfarbe","tagline":"Unterzeile / Slogan","logoUrl":"URL des gehosteten Logos <small>empfohlen</small>","options":"Optionen","showCompany":"Unternehmenszeile anzeigen","showCompanyDesc":"Zeigt „PortMix SA“ unter der Position an.","showLocation":"Standort anzeigen","showLocationDesc":"Nützlich für die lokale Kundenkommunikation.","showTagline":"Slogan anzeigen","showTaglineDesc":"Fügt die feine Abschlusslinie aus dem freigegebenen Entwurf hinzu.","livePreview":"Live-Vorschau","desktopPreview":"E-Mail-Vorschau am Desktop","phonePreview":"Vorschau in Smartphone-Breite","desktop":"Desktop","phoneBtn":"Smartphone","message":"Guten Tag,<br><br>vielen Dank für Ihre Nachricht. Meine Kontaktdaten finden Sie unten.<br><br>Freundliche Grüße,","generatedHtml":"Generiertes, E-Mail-kompatibles HTML","copyCode":"Code kopieren","installation":"Installation","installationTitle":"So installieren Sie die generierte Signatur","guidance":"Anleitung anhand offizieller Support-Dokumentation geprüft • August 2026","deployment":"<strong>Empfohlene Bereitstellung:</strong> Laden Sie <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> und die vier PNG-Symbole in denselben HTTPS-Ordner wie diesen Generator hoch (z. B. <b>/signature/</b>). Der Generator verlinkt sie dann, statt base64 einzubetten — die Signatur bleibt klein und lädt schnell.","bestPractice":"<strong>Empfehlung:</strong> Senden Sie nach der Installation Test-E-Mails aus Outlook, Gmail und vom Smartphone an ein Gmail- und ein Outlook-Postfach. Prüfen Sie Logo, Links, Abstände und das Verhalten bei Antworten. Manche Empfänger oder Unternehmensrichtlinien blockieren externe Bilder automatisch; das ist eine Sicherheitseinstellung des E-Mail-Clients und kein Fehler der Signatur.","source":"Die Signatur verwendet Präsentationstabellen, Inline-CSS, websichere Schriften, feste Spaltenbreiten, mso-line-height-rule für Outlook und link-sichere Inline-Stile. Leere Felder werden automatisch aus dem Layout entfernt. JavaScript wird nur im Generator verwendet, nie in der Signatur.","footer":"Signature Studio · Eigenständiger HTML-Generator · Bearbeitung und Generierung erfolgen lokal im Browser.","logoHosted":"<strong>Gehostetes Logo:</strong> Die Signatur nutzt Ihre öffentliche HTTPS-URL — am besten für Gmail und Outlook.","logoPackage":"<strong>Logo aus dem Paket:</strong> Der Generator verwendet <b>portmix-signature-logo.png</b> aus demselben Ordner. Das ist die einfachste Variante.","logoOffline":"<strong>Offline-Logo:</strong> Das Logo ist als base64 eingebettet, damit der Generator lokal funktioniert. Das vergrößert den Code — laden Sie für den Produktivbetrieb die PNG-Dateien in einen HTTPS-Ordner hoch oder tragen Sie oben eine Logo-URL ein.","toastSignature":"Signatur kopiert — fügen Sie sie in Ihren E-Mail-Client ein.","toastBlocked":"Der Browser hat das automatische Kopieren blockiert. Verwenden Sie „HTML anzeigen“ oder markieren Sie die Vorschau manuell.","toastMobile":"Mobile Textsignatur kopiert.","toastCode":"HTML-Code kopiert.","toastDownloaded":"Signatur-HTML heruntergeladen.","toastReset":"Standardwerte wiederhergestellt.","emailSignatureTitle":"E-Mail-Signatur","defaultTitle":"Gründer & Geschäftsführer","defaultTagline":"INTELLIGENTE LÖSUNGEN. STÄRKERE VERBINDUNGEN.","guides":[{"tag":"Gmail · Web","title":"Vollständige visuelle Signatur","html":"<ol><li>Klicken Sie oben auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie in Gmail <b>Einstellungen → Alle Einstellungen aufrufen</b>.</li><li>Erstellen Sie unter <b>Allgemein → Signatur</b> eine neue Signatur.</li><li>Klicken Sie in den Signatur-Editor und fügen Sie den Inhalt ein.</li><li>Legen Sie die Standards für neue E-Mails sowie Antworten/Weiterleitungen fest.</li><li>Scrollen Sie nach unten und klicken Sie auf <b>Änderungen speichern</b>.</li></ol>","link":"Offizielle Gmail-Anleitung ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"},{"tag":"Outlook · Neu / Web","title":"Empfohlene Microsoft-Einrichtung","html":"<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie Outlook <b>Einstellungen → Konten → Signaturen</b>.</li><li>Wählen Sie das richtige Konto und <b>Signatur hinzufügen</b>.</li><li>Fügen Sie die Signatur in den Editor ein.</li><li>Wählen Sie, ob sie für neue Nachrichten und Antworten/Weiterleitungen verwendet werden soll.</li><li>Klicken Sie auf <b>Speichern</b>.</li></ol>","link":"Offizielle Outlook-Anleitung ↗","url":"https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"},{"tag":"Outlook · Classic Windows","title":"Klassisches Outlook für Windows","html":"<ol><li>Klicken Sie auf <b>Signatur kopieren</b>.</li><li>Öffnen Sie <b>Neue E-Mail → Nachricht → Signatur → Signaturen</b>.</li><li>Wählen Sie <b>Neu</b>, benennen Sie die Signatur und fügen Sie sie unter <b>Signatur bearbeiten</b> ein.</li><li>Wählen Sie die Standardsignatur für neue Nachrichten und optional für Antworten/Weiterleitungen.</li><li>Speichern Sie mit <b>OK</b>.</li></ol><p>Microsoft unterstützt kopierte Vorlagen, Tabellen, Links und Bilder in klassischen Outlook-Signaturen.</p>","link":"","url":""},{"tag":"Gmail · iPhone / Android","title":"Desktop-Signatur beibehalten","html":"<p>Wenn Sie in der Gmail-App <b>keine mobile Signatur</b> erstellen, verwenden neue Nachrichten die am Computer eingerichtete Signatur.</p><ol><li>Installieren Sie zuerst die vollständige Signatur in Gmail im Web.</li><li>Lassen Sie <b>Mobile Signatur</b> in der Gmail-App leer/deaktiviert.</li><li>Senden Sie eine Testnachricht vom Smartphone.</li></ol>","link":"Offizielle Gmail-Mobilanleitung ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"},{"tag":"Outlook · iOS / Android","title":"Mobile Ersatzversion","html":"<p>Outlook Mobile bietet pro Konto ein Signaturfeld unter <b>Einstellungen → Mail → Signatur</b>. Für ein zuverlässiges Ergebnis verwenden Sie <b>Mobiltext kopieren</b>.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie in Outlook Mobile <b>Einstellungen → Mail → Signatur</b>.</li><li>Aktivieren Sie bei Bedarf <b>Signatur pro Konto</b>.</li><li>Fügen Sie den Text ein und speichern Sie.</li></ol>","link":"Offizielle Outlook-Mobilanleitung ↗","url":"https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"},{"tag":"Apple Mail · iPhone","title":"Textversion für Apple Mail","html":"<p>Laut aktueller iPhone-Dokumentation von Apple sind Mail-Signaturen in den Einstellungen <b>nur Text</b>. Verwenden Sie daher die mobile Textversion.</p><ol><li>Klicken Sie auf <b>Mobiltext kopieren</b>.</li><li>Öffnen Sie <b>Einstellungen → Apps → Mail → Signatur</b>.</li><li>Wählen Sie bei Bedarf <b>Pro Account</b>.</li><li>Fügen Sie die Textsignatur ein.</li></ol>","link":"Offizielle Apple-Anleitung ↗","url":"https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}],"mobilePhone":"Mobil <small>optional</small>","format":"Signaturformat","size":"Größe","sizeCompact":"Kompakt","sizeStandard":"Standard","sizeLarge":"Groß","layout":"Layout","layoutSplit":"Logo links","layoutStacked":"Logo oben","layoutPanel":"Bildpanel","iconMode":"Symbole","iconImages":"Bilder","iconLabels":"Kürzel (T/E/W)","iconNone":"Ohne Symbole","sizeMeter":"Codegröße: {n} Zeichen","sizeOk":"Passt in Gmail","sizeNear":"Nahe am Gmail-Limit","sizeOver":"Über Gmail-Limit (10.000)","previewNote":"Die Vorschau zeigt eine reale E-Mail-Fensterbreite","studioTag":"PortMix · Helvetique","toastBrand":"Firmenprofil: {n}","panelLabel":"Panelbild","panelHint":"Foto wählen und drei Wörter eingeben. Das Bild wird hier erzeugt und auf dem Server gespeichert — die Signatur verwendet dann Ihres.","panelSave":"Bild speichern","panelReset":"Standard wiederherstellen","panelSaving":"Wird gespeichert…","panelSaved":"Gespeichert. Die Signatur verwendet jetzt Ihr Bild.","panelFailed":"Speichern fehlgeschlagen — bitte erneut versuchen.","panelNotImage":"Das ist kein Bild.","panelTooBig":"Das Bild ist zu groß (max. 8 MB)."},"fr":{"docTitle":"Signature Studio","brandSubtitle":"Générateur de signature professionnel, épuré et simple pour le client","language":"Langue","reset":"Réinitialiser","copyMobile":"Copier le texte mobile","viewHtml":"Afficher le HTML","hideHtml":"Masquer le HTML","copySignature":"Copier la signature","downloadHtml":"Télécharger le HTML","editor":"Éditeur","signatureDetails":"Détails de la signature","identity":"Identité","fullName":"Nom et prénom","jobTitle":"Fonction","company":"Entreprise","contact":"Contact","phone":"Téléphone","email":"E-mail","website":"Site web","address":"Lieu / adresse","mapLink":"Lien de carte <small>facultatif</small>","brand":"Marque","accent":"Couleur d’accent","tagline":"Ligne inférieure / slogan","logoUrl":"URL du logo hébergé <small>recommandé</small>","options":"Options","showCompany":"Afficher l’entreprise","showCompanyDesc":"Affiche « PortMix SA » sous la fonction.","showLocation":"Afficher le lieu","showLocationDesc":"Utile pour la communication avec les clients locaux.","showTagline":"Afficher le slogan","showTaglineDesc":"Ajoute la fine ligne de bas de page du concept approuvé.","livePreview":"Aperçu en direct","desktopPreview":"Aperçu e-mail sur ordinateur","phonePreview":"Aperçu largeur téléphone","desktop":"Ordinateur","phoneBtn":"Téléphone","message":"Bonjour,<br><br>Merci pour votre message. Vous trouverez mes coordonnées ci-dessous.<br><br>Cordialement,","generatedHtml":"HTML généré compatible avec les clients e-mail","copyCode":"Copier le code","installation":"Installation","installationTitle":"Comment installer la signature générée","guidance":"Instructions vérifiées à partir de la documentation officielle • août 2026","deployment":"<strong>Déploiement recommandé :</strong> téléversez <b>portmix-signature-logo.png</b>, <b>helvetique-signature-logo.png</b> et les quatre icônes PNG dans le même dossier HTTPS que ce générateur (par exemple <b>/signature/</b>). Le générateur y fera référence au lieu d'intégrer du base64, ce qui garde la signature légère et rapide à charger.","bestPractice":"<strong>Bonne pratique :</strong> après l'installation, envoyez des e-mails de test depuis Outlook, Gmail et le téléphone vers une boîte Gmail et une boîte Outlook. Vérifiez le chargement du logo, les liens, les espacements et le comportement lors des réponses. Certains destinataires ou politiques d'entreprise bloquent le chargement automatique des images externes ; il s'agit d'un réglage de sécurité du client e-mail, pas d'une erreur de signature.","source":"La signature utilise des tableaux de présentation, du CSS en ligne, des polices web sûres, des largeurs de colonnes fixes, mso-line-height-rule pour Outlook et des liens stylés en ligne. Les champs vides sont automatiquement retirés de la mise en page. JavaScript est utilisé uniquement dans le générateur, jamais dans la signature.","footer":"Signature Studio · Générateur HTML autonome · Toute l'édition et la génération se font localement dans le navigateur.","logoHosted":"<strong>Logo hébergé :</strong> la signature utilise votre URL HTTPS publique — idéal pour Gmail et Outlook.","logoPackage":"<strong>Logo du package :</strong> le générateur utilise <b>portmix-signature-logo.png</b> depuis ce même dossier. C'est la configuration la plus simple à maintenir.","logoOffline":"<strong>Logo hors ligne :</strong> le logo est intégré en base64 pour que le générateur fonctionne localement. Cela alourdit le code — en production, téléversez les fichiers PNG dans un dossier HTTPS ou saisissez une URL de logo ci-dessus.","toastSignature":"Signature copiée — collez-la dans votre client e-mail.","toastBlocked":"Le navigateur a bloqué la copie automatique. Utilisez « Afficher le HTML » ou sélectionnez manuellement l’aperçu.","toastMobile":"Version texte mobile copiée.","toastCode":"Code HTML copié.","toastDownloaded":"HTML de la signature téléchargé.","toastReset":"Valeurs par défaut restaurées.","emailSignatureTitle":"Signature e-mail","defaultTitle":"Fondateur & Directeur général","defaultTagline":"SOLUTIONS INTELLIGENTES. DES CONNEXIONS PLUS FORTES.","guides":[{"tag":"Gmail · Web","title":"Signature visuelle complète","html":"<ol><li>Cliquez sur <b>Copier la signature</b> ci-dessus.</li><li>Dans Gmail, ouvrez <b>Paramètres → Voir tous les paramètres</b>.</li><li>Dans <b>Général → Signature</b>, créez une nouvelle signature.</li><li>Cliquez dans l’éditeur de signature et collez le contenu.</li><li>Choisissez les valeurs par défaut pour les nouveaux e-mails et les réponses/transferts.</li><li>En bas de la page, cliquez sur <b>Enregistrer les modifications</b>.</li></ol>","link":"Instructions officielles Gmail ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DDesktop&hl=en"},{"tag":"Outlook · Nouveau / Web","title":"Configuration Microsoft recommandée","html":"<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez Outlook <b>Paramètres → Comptes → Signatures</b>.</li><li>Sélectionnez le bon compte puis <b>Ajouter une signature</b>.</li><li>Collez la signature dans l’éditeur.</li><li>Choisissez si elle doit être utilisée pour les nouveaux messages et les réponses/transferts.</li><li>Cliquez sur <b>Enregistrer</b>.</li></ol>","link":"Instructions officielles Outlook ↗","url":"https://support.microsoft.com/en-us/outlook/mail/how-to-add-and-change-an-email-signature-in-outlook"},{"tag":"Outlook · Classic Windows","title":"Outlook classique pour Windows","html":"<ol><li>Cliquez sur <b>Copier la signature</b>.</li><li>Ouvrez <b>Nouveau message → Message → Signature → Signatures</b>.</li><li>Choisissez <b>Nouveau</b>, nommez la signature puis collez-la dans <b>Modifier la signature</b>.</li><li>Sélectionnez la signature par défaut pour les nouveaux messages et, si souhaité, les réponses/transferts.</li><li>Enregistrez avec <b>OK</b>.</li></ol><p>Microsoft prend en charge les modèles copiés, tableaux, liens et images dans les signatures Outlook classiques.</p>","link":"","url":""},{"tag":"Gmail · iPhone / Android","title":"Conserver la signature du bureau","html":"<p>Si vous <b>ne créez pas de signature mobile</b> dans l’application Gmail, les nouveaux messages utilisent la signature configurée sur l’ordinateur.</p><ol><li>Installez d’abord la signature complète dans Gmail sur le web.</li><li>Dans l’application Gmail, laissez <b>Signature mobile</b> non définie/désactivée.</li><li>Envoyez un message de test depuis le téléphone.</li></ol>","link":"Instructions mobiles officielles Gmail ↗","url":"https://support.google.com/mail/answer/8395?co=GENIE.Platform%3DiOS&hl=en"},{"tag":"Outlook · iOS / Android","title":"Version mobile de secours","html":"<p>Outlook mobile propose un champ de signature par compte dans <b>Paramètres → Mail → Signature</b>. Pour un résultat fiable, utilisez le bouton <b>Copier le texte mobile</b>.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Dans Outlook mobile, ouvrez <b>Paramètres → Mail → Signature</b>.</li><li>Activez si nécessaire <b>Signature par compte</b>.</li><li>Collez le texte et enregistrez.</li></ol>","link":"Instructions mobiles officielles Outlook ↗","url":"https://support.microsoft.com/en-us/outlook/can-i-change-my-email-signature"},{"tag":"Apple Mail · iPhone","title":"Version texte pour Apple Mail","html":"<p>La documentation iPhone actuelle d’Apple indique que les signatures Mail dans Réglages sont <b>uniquement du texte</b>. Utilisez donc la version texte mobile.</p><ol><li>Cliquez sur <b>Copier le texte mobile</b>.</li><li>Ouvrez <b>Réglages → Apps → Mail → Signature</b>.</li><li>Choisissez <b>Par compte</b> si nécessaire.</li><li>Collez la signature texte.</li></ol>","link":"Instructions officielles Apple ↗","url":"https://support.apple.com/guide/iphone/change-mail-settings-iph80dabb18b/ios"}],"mobilePhone":"Mobile <small>facultatif</small>","format":"Format de signature","size":"Taille","sizeCompact":"Compacte","sizeStandard":"Standard","sizeLarge":"Grande","layout":"Disposition","layoutSplit":"Logo à gauche","layoutStacked":"Logo en haut","layoutPanel":"Panneau image","iconMode":"Icônes","iconImages":"Images","iconLabels":"Libellés (T/E/W)","iconNone":"Sans icônes","sizeMeter":"Taille du code : {n} caractères","sizeOk":"Compatible Gmail","sizeNear":"Proche de la limite Gmail","sizeOver":"Dépasse la limite Gmail (10 000)","previewNote":"L'aperçu montre une largeur réelle de fenêtre e-mail","studioTag":"PortMix · Helvetique","toastBrand":"Profil d'entreprise : {n}","panelLabel":"Image du panneau","panelHint":"Choisissez une photo et saisissez trois mots. L'image est composée ici puis enregistrée sur le serveur — la signature utilise alors la vôtre.","panelSave":"Enregistrer l'image","panelReset":"Rétablir l'image d'origine","panelSaving":"Enregistrement…","panelSaved":"Enregistré. La signature utilise maintenant votre image.","panelFailed":"Échec de l'enregistrement — réessayez.","panelNotImage":"Ce n'est pas une image.","panelTooBig":"Image trop volumineuse (8 Mo max)."}};
 
 const ARIAL   = "Arial,Helvetica,sans-serif";
 const GEORGIA = "Georgia,'Times New Roman',Times,serif";
@@ -405,7 +438,10 @@ const $ = id => document.getElementById(id);
 
 let currentLang = 'bs';
 let brand = 'portmix';
-let opts = {size:'compact', layout:'split', icons:'images'};
+let opts = {size:'standard', layout:'panel', icons:'images'};
+/* Panel je PortMixov; kad se ode na drugi brend privremeno se sklanja,
+   a ovo pamti da ga treba vratiti pri povratku. */
+let panelOdlozen = false;
 
 const trDefaultTitles   = Object.values(I18N).map(x => x.defaultTitle);
 const trDefaultTaglines = Object.values(I18N).map(x => x.defaultTagline);
@@ -440,6 +476,24 @@ function state(){
   return s;
 }
 const resolveAsset = (file, b64) => isHosted() ? new URL(file, location.href).href : 'data:image/png;base64,'+b64;
+
+/**
+ * Panel i krupne ikone se NE ugrađuju kao base64.
+ *
+ * Panel je fotografija od ~61 kB; u base64 to je ~82 kB, a Gmail siječe
+ * poruku preko 102 kB i sakrije potpis pod „...". Zato uvijek ide kao
+ * adresa. Kad se studio otvori kao lokalni fajl, koristi se javna adresa
+ * na portmix.ch — slika tamo postoji, pa potpis radi i tada.
+ */
+const JAVNA_BAZA = 'https://www.portmix.ch/signatura/';
+const resolveHosted = file => isHosted() ? new URL(file, location.href).href : JAVNA_BAZA + file;
+const PANEL_FILE = 'portmix-signature-panel.jpg';
+/* Prirodne dimenzije panel slike. Drze se ovdje da se visina u potpisu
+   racuna iz njih — ako se slika ikad prerenderuje, mijenja se samo ovo. */
+const PANEL_W = 800, PANEL_H = 908;
+/* originalne ikone su 32 px; ove su 96 px jer ih panel raspored prikazuje
+   na ~26 px, gdje bi 32 px na retini bilo vidljivo mekano */
+const ICON_FILES_XL = {phone:'icon-phone-96.png', mail:'icon-mail-96.png', web:'icon-web-96.png', location:'icon-location-96.png'};
 function resolveLogo(s){
   if(s.logoUrl) return normalizeWebUrl(s.logoUrl);
   return resolveAsset(s.brand.logoFile, ASSETS[s.brand.logoAsset]);
@@ -467,17 +521,19 @@ function link(href, text, color, wrap){
        + `<span style="color:${color} !important;text-decoration:none !important;${nw}">${escapeHtml(text)}</span></a>`;
 }
 
-function contactCell(item, p, s){
+function contactCell(item, p, s, o){
+  o = o || {};
   const t = s.brand.theme;
   const td = `font-family:${t.bodyFont};font-size:${p.body}px;line-height:${p.bodyLh}px;`
            + `mso-line-height-rule:exactly;color:${t.bodyColor};vertical-align:middle;`;
   const body = link(item.href, item.text, t.bodyColor, item.wrap);
   if(s.icons === 'images'){
-    const iw = p.icon, cell = iw + 9;
+    const iw = o.iconSize || p.icon, cell = iw + (o.iconGap || 9);
+    const src = o.xlIcons ? resolveHosted(ICON_FILES_XL[item.kind]) : iconSrc(item.kind);
     return `<table role="presentation" border="0" cellpadding="0" cellspacing="0"`
       + ` style="border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;"><tr>`
-      + `<td width="${cell}" valign="middle" style="width:${cell}px;padding:0 9px 0 0;vertical-align:middle;">`
-      + `<img src="${escapeHtml(iconSrc(item.kind))}" width="${iw}" height="${iw}" alt=""`
+      + `<td width="${cell}" valign="middle" style="width:${cell}px;padding:0 ${o.iconGap || 9}px 0 0;vertical-align:middle;">`
+      + `<img src="${escapeHtml(src)}" width="${iw}" height="${iw}" alt=""`
       + ` style="display:block;width:${iw}px;height:${iw}px;border:0;outline:none;text-decoration:none;"></td>`
       + `<td valign="middle" style="padding:0;${td}">${body}</td></tr></table>`;
   }
@@ -490,10 +546,12 @@ function contactCell(item, p, s){
 
 const estWidth = (text, fs) => String(text).length * fs * 0.55;
 
-function contactBlock(s, p, width, maxCols){
+function contactBlock(s, p, width, maxCols, o){
+  o = o || {};
   const items = contactItems(s);
   if(!items.length) return '';
-  const iconW = s.icons === 'images' ? p.icon + 9 : (s.icons === 'labels' ? p.body * 1.6 : 0);
+  const ikonaPx = o.iconSize || p.icon;
+  const iconW = s.icons === 'images' ? ikonaPx + (o.iconGap || 9) : (s.icons === 'labels' ? p.body * 1.6 : 0);
   const halfCol = Math.floor((width - 33) / 2);
   const fits = items.filter(it => !it.wrap).every(it => estWidth(it.text, p.body) + iconW <= halfCol);
   const cols = (maxCols === 2 && fits && items.length > 1) ? 2 : 1;
@@ -501,24 +559,29 @@ function contactBlock(s, p, width, maxCols){
   const rows=[];
   if(cols === 1){
     items.forEach((it,i) =>
-      rows.push(`<tr><td style="padding:${i?p.gap:0}px 0 0 0;">${contactCell(it,p,s)}</td></tr>`));
+      rows.push(`<tr><td style="padding:${i?(o.rowGap||p.gap):0}px 0 0 0;">${contactCell(it,p,s,o)}</td></tr>`));
   }else{
-    const gutter = 16;
-    const colA = Math.floor((width - gutter - 1 - gutter) / 2);
-    const colB = width - gutter - 1 - gutter - colA;
+    /* Bez uspravne crte (panel raspored): kolone razdvaja samo razmak,
+       kako je i na nacrtu. Tada se sirina crte racuna kao 0. */
+    const crta = o.divider === false ? 0 : 1;
+    const gutter = o.gutter || 16;
+    const colA = Math.floor((width - gutter - crta - gutter) / 2);
+    const colB = width - gutter - crta - gutter - colA;
     for(let i=0;i<items.length;i+=2){
       const a=items[i], b=items[i+1];
-      const pad = i ? `padding:${p.gap}px 0 0 0;` : 'padding:0;';
+      const pad = i ? `padding:${o.rowGap || p.gap}px 0 0 0;` : 'padding:0;';
       if(b){
         rows.push(`<tr>`
-          + `<td width="${colA}" valign="middle" style="width:${colA}px;${pad}vertical-align:middle;">${contactCell(a,p,s)}</td>`
+          + `<td width="${colA}" valign="middle" style="width:${colA}px;${pad}vertical-align:middle;">${contactCell(a,p,s,o)}</td>`
           + `<td width="${gutter}" style="width:${gutter}px;${pad}font-size:0;line-height:0;">&nbsp;</td>`
-          + `<td width="1" bgcolor="${rule}" style="width:1px;background-color:${rule};${pad}font-size:0;line-height:0;">&nbsp;</td>`
+          + (crta
+              ? `<td width="1" bgcolor="${rule}" style="width:1px;background-color:${rule};${pad}font-size:0;line-height:0;">&nbsp;</td>`
+              : '')
           + `<td width="${gutter}" style="width:${gutter}px;${pad}font-size:0;line-height:0;">&nbsp;</td>`
-          + `<td width="${colB}" valign="middle" style="width:${colB}px;${pad}vertical-align:middle;">${contactCell(b,p,s)}</td>`
+          + `<td width="${colB}" valign="middle" style="width:${colB}px;${pad}vertical-align:middle;">${contactCell(b,p,s,o)}</td>`
           + `</tr>`);
       }else{
-        rows.push(`<tr><td colspan="5" valign="middle" style="${pad}vertical-align:middle;">${contactCell(a,p,s)}</td></tr>`);
+        rows.push(`<tr><td colspan="${crta ? 5 : 4}" valign="middle" style="${pad}vertical-align:middle;">${contactCell(a,p,s,o)}</td></tr>`);
       }
     }
   }
@@ -565,6 +628,36 @@ function taglineBlock(s, p, width, colspan){
     + `letter-spacing:${ls}px;text-transform:uppercase;">${inner}</td></tr></table></td></tr>`;
 }
 
+/**
+ * Traka sa sloganom u panel rasporedu: tanka linija, pa tekst lijevo i
+ * kratka crvena crtica desno — kako je na nacrtu.
+ *
+ * ⚠️ Crtica je zasebna celija sa `bgcolor`, ne `border`. Outlook zna
+ * progutati tanke ivice na praznoj celiji, a obojenu celiju uvijek nacrta.
+ */
+function taglinePanel(s, p, width){
+  if(!(s.showTagline && s.tagline)) return '';
+  const t = s.brand.theme;
+  const ls = (p.tagLs * t.tagLs).toFixed(1);
+  const crtica = 34;
+  return `<tr><td style="padding:${p.block}px 0 0 0;">`
+    + `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="${width}"`
+    + ` style="width:${width}px;border-collapse:collapse;mso-table-lspace:0pt;mso-table-rspace:0pt;">`
+    + `<tr><td colspan="3" height="1" bgcolor="${t.rule}"`
+    + ` style="height:1px;background-color:${t.rule};font-size:0;line-height:0;">&nbsp;</td></tr>`
+    + `<tr>`
+    + `<td valign="middle" style="padding:${Math.round(p.block*0.62)}px 0 0 0;font-family:${t.bodyFont};`
+    + `font-size:${p.tag}px;line-height:${Math.round(p.tag*1.6)}px;mso-line-height-rule:exactly;`
+    + `letter-spacing:${ls}px;text-transform:uppercase;color:${t.tagColor};vertical-align:middle;">`
+    + `${escapeHtml(s.tagline)}</td>`
+    + `<td width="12" style="width:12px;font-size:0;line-height:0;">&nbsp;</td>`
+    + `<td width="${crtica}" valign="middle" style="width:${crtica}px;padding:${Math.round(p.block*0.62)}px 0 0 0;vertical-align:middle;">`
+    + `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="${crtica}"`
+    + ` style="width:${crtica}px;border-collapse:collapse;">`
+    + `<tr><td height="2" bgcolor="${s.accent}" style="height:2px;background-color:${s.accent};font-size:0;line-height:0;">&nbsp;</td></tr>`
+    + `</table></td></tr></table></td></tr>`;
+}
+
 function buildSignature(s){
   const p = PRESETS[s.size] || PRESETS.compact;
   const t = s.brand.theme;
@@ -578,6 +671,67 @@ function buildSignature(s){
   const logoImg = `<a href="${webHref}" style="text-decoration:none;">`
     + `<img src="${logoSrc}" width="${logoW}" alt="${escapeHtml(s.company || 'Logo')}"`
     + ` style="display:block;width:${logoW}px;max-width:${logoW}px;height:auto;border:0;outline:none;text-decoration:none;"></a>`;
+
+  /**
+   * PANEL RASPORED — lijevo slika, desno podaci.
+   *
+   * 🚨 Lijeva strana MORA biti jedna slika. Fotografija sa bijelim logom,
+   * uspravnim tekstom i dijagonalnim crvenim rezom se u pošti ne može
+   * nacrtati: Outlook (Word) ne zna pozadinske slike, `clip-path` ni
+   * rotaciju. Desna strana ostaje pravi tekst — da linkovi rade i da nešto
+   * ostane kad primalac blokira slike.
+   *
+   * ⚠️ Slika je pravougaonik, a dijagonala je UNUTAR nje, sa bijelim klinom
+   * desno. Ćelija se ne može presjeći koso, pa se spoj sakriva time što je
+   * desna ćelija takođe bijela.
+   *
+   * Panel je samo za PortMix — nosi njihovu fotografiju i logo. Kod drugog
+   * brenda se tiho vraća na „logo lijevo".
+   */
+  if(s.layout === 'panel' && s.brand.key === 'portmix'){
+    /* ⚠️ Panel raspored ima VLASTITU sirinu, ne p.w. Na 600 px desnoj strani
+       ostane 332 px, a tu telefon sa krupnom ikonom promasi dvije kolone za
+       tri piksela — pa kontakti tiho ispadnu u jedan stubac. 640 px daje
+       dvije kolone kako je na nacrtu. */
+    const Wp = 640;
+    const panelW = 236;
+    const panelH = Math.round(panelW * PANEL_H / PANEL_W);
+    const rightW = Wp - panelW;
+    const pad = p.pad;
+    const innerW = rightW - pad * 2;
+    /* ime i firma su krupniji nego u ostalim rasporedima — panel je visok
+       pa desna strana ima prostora, a na nacrtu ime nosi cijeli blok */
+    const pp = Object.assign({}, p, {
+      name:   Math.round(p.name * 1.18),
+      nameLh: Math.round(p.nameLh * 1.18),
+      comp:   Math.round(p.comp * 1.10),
+      compLh: Math.round(p.compLh * 1.10)
+    });
+    const kontakti = {
+      divider: false,                              /* nacrt nema uspravnu crtu */
+      iconSize: Math.round(p.icon * 1.62),         /* krupni crveni krugovi */
+      iconGap: Math.round(p.icon * 0.75),
+      rowGap: Math.round(p.gap * 1.45),
+      gutter: Math.round(p.pad * 0.85),
+      xlIcons: true
+    };
+    return `<table ${outer} width="${Wp}" style="width:${Wp}px;${ts}background:#ffffff;">`
+      + `<tr>`
+      + `<td width="${panelW}" valign="top" style="width:${panelW}px;padding:0;font-size:0;line-height:0;">`
+      +   `<a href="${webHref}" style="text-decoration:none;">`
+      +   `<img src="${escapeHtml(panelUrl())}" width="${panelW}" height="${panelH}"`
+      +   ` alt="${escapeHtml(s.company || 'PortMix')}"`
+      +   ` style="display:block;width:${panelW}px;height:${panelH}px;border:0;outline:none;text-decoration:none;"></a>`
+      + `</td>`
+      + `<td width="${rightW}" valign="middle" style="width:${rightW}px;padding:${pad}px ${pad}px ${pad}px ${pad}px;vertical-align:middle;">`
+      +   `<table ${outer} width="${innerW}" style="width:${innerW}px;${ts}">`
+      +     identityBlock(s, pp)
+      +     `<tr><td height="${Math.round(p.block*1.15)}" style="height:${Math.round(p.block*1.15)}px;font-size:0;line-height:${Math.round(p.block*1.15)}px;">&nbsp;</td></tr>`
+      +     `<tr><td>${contactBlock(s, p, innerW, 2, kontakti)}</td></tr>`
+      +     taglinePanel(s, p, innerW)
+      +   `</table>`
+      + `</td></tr></table>`;
+  }
 
   if(s.layout === 'stacked'){
     return `<table ${outer} width="${W}" style="width:${W}px;${ts}background:#ffffff;">`
@@ -625,6 +779,9 @@ const GMAIL_LIMIT = 10000;
 
 function render(){
   const s = state();
+  /* Panel postoji samo u tom rasporedu — u ostalima uređivač nema šta da radi. */
+  const pg = $('panelGrupa');
+  if(pg) pg.hidden = !(brand === 'portmix' && opts.layout === 'panel');
   const html = buildSignature(s);
   $('signaturePreview').innerHTML = html;
   $('htmlOutput').textContent = html;
@@ -652,6 +809,249 @@ function renderGuides(){
     </article>`).join('');
 }
 
+/* ═══════════════════════════ PANEL PO MJERI ═══════════════════════════
+
+   🚨 ZAŠTO CANVAS, A NE HTML.
+
+   Tri riječi su UNUTAR slike, i moraju ostati. Outlook (Wordov pogon) ne
+   može tekst preko slike, a ne prikazuje ni ugrađene (`data:`) slike — zato
+   je dijagonala i rađena kao raster. Dakle svaka kombinacija fotografije i
+   riječi mora postati NOVA SLIKA na nekoj adresi.
+
+   Ovdje preglednik složi tačno ono što je `panel.html` radio pri gradnji:
+   fotografija, veo, bijeli klin, crvena dijagonala, logo, crvena crtica i
+   tri riječi — na 800×908. Rezultat se šalje na server i vraća kao adresa.
+
+   ⚠️ Brojke ispod NISU proizvoljne. Prepisane su iz `panel.html`; ako se
+   tamo ikad promijene, moraju i ovdje. Isto vrijedi za PANEL_W/PANEL_H —
+   proporcija je izmjerena prema desnoj koloni potpisa (269 px pri 236 px
+   panela), pa promjena visine rasteže sliku.                              */
+
+const PANEL_ORIG_RIJECI = ['DESIGN', 'PLAN', 'REALISE'];
+const PANEL_LOGO_FILE = 'logo-bijeli.png';
+const PANEL_MAX_MB = 8;
+
+/** Adresa panela koju je klijent sam napravio; prazno = tvornički panel. */
+let panelVlastiti = '';
+try { panelVlastiti = localStorage.getItem('portmix.panel') || ''; } catch { /* privatni prozor */ }
+
+let panelFoto = null;   /* korisnikova fotografija (HTMLImageElement) */
+let panelLogo = null;   /* bijeli PortMix logo, učita se jednom */
+let panelSalje = false;
+
+/** Adresa koja ide u potpis. */
+const panelUrl = () => panelVlastiti || resolveHosted(PANEL_FILE);
+
+const panelRijeci = () =>
+  [0, 1, 2].map((i) => ($('rijec' + i)?.value ?? PANEL_ORIG_RIJECI[i]).trim().toUpperCase());
+
+/* ─────────────────────────── crtanje ─────────────────────────── */
+
+function panelPoligon(ctx, tacke, boja) {
+  ctx.beginPath();
+  tacke.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.closePath();
+  ctx.fillStyle = boja;
+  ctx.fill();
+}
+
+/**
+ * Tekst sa razmakom između slova.
+ *
+ * ⚠️ Ručno, slovo po slovo, iako canvas ima `letterSpacing`. Ta osobina je
+ * stigla u preglednike u različito vrijeme i različito zaokružuje — a dvoje
+ * ljudi mora dobiti ISTI panel. Ovako je ispis isti svugdje.
+ *
+ * ⚠️ CSS `letter-spacing` dodaje razmak IZA svakog slova, pa i iza zadnjeg;
+ * kod lijevo poravnatog teksta se to ne vidi, ali se tako i računa.
+ */
+function panelTekstRazmaknut(ctx, tekst, x, y, razmak) {
+  let cx = x;
+  for (const z of tekst) {
+    ctx.fillText(z, cx, y);
+    cx += ctx.measureText(z).width + razmak;
+  }
+}
+
+function nacrtajPanel(ctx) {
+  const W = PANEL_W, H = PANEL_H;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  /* 1 ── fotografija: `background-size: auto 112%` + `position: 58% 55%` */
+  if (panelFoto && panelFoto.naturalWidth) {
+    const dh = H * 1.12;
+    const dw = dh * (panelFoto.naturalWidth / panelFoto.naturalHeight);
+    ctx.drawImage(panelFoto, (W - dw) * 0.58, (H - dh) * 0.55, dw, dh);
+  } else {
+    ctx.fillStyle = '#1a1a1e';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* 2 ── veo: linear-gradient(112deg, …)
+     CSS ugao mjeri od „prema gore" u smjeru kazaljke; dužina linije je
+     |W·sin| + |H·cos|, a linija prolazi kroz sredinu. */
+  const a = (112 * Math.PI) / 180;
+  const L = Math.abs(W * Math.sin(a)) + Math.abs(H * Math.cos(a));
+  const dx = Math.sin(a), dy = -Math.cos(a);
+  const g = ctx.createLinearGradient(
+    W / 2 - (dx * L) / 2, H / 2 - (dy * L) / 2,
+    W / 2 + (dx * L) / 2, H / 2 + (dy * L) / 2
+  );
+  g.addColorStop(0, 'rgba(8,8,10,.88)');
+  g.addColorStop(0.4, 'rgba(8,8,10,.74)');
+  g.addColorStop(0.7, 'rgba(8,8,10,.38)');
+  g.addColorStop(1, 'rgba(8,8,10,.12)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  /* 3 ── bijeli klin (desna ćelija potpisa se nastavlja bijelom) */
+  panelPoligon(ctx, [[662, 0], [800, 0], [800, 908], [790, 908]], '#ffffff');
+  /* 4 ── crvena dijagonala */
+  panelPoligon(ctx, [[648, 0], [668, 0], [796, 908], [776, 908]], '#E3000F');
+
+  /* 5 ── sadržaj: lijevo 58 px, uspravno centriran */
+  const X = 58;
+  const LOGO_W = 430, CRTA_MT = 54, CRTA_H = 5, RIJEC_MT = 62, LH = 68;
+  const logoH = panelLogo && panelLogo.naturalWidth
+    ? LOGO_W * (panelLogo.naturalHeight / panelLogo.naturalWidth)
+    : 0;
+
+  const ukupno = logoH + CRTA_MT + CRTA_H + RIJEC_MT + LH * 3;
+  let y = (H - ukupno) / 2;
+
+  if (panelLogo && panelLogo.naturalWidth) ctx.drawImage(panelLogo, X, y, LOGO_W, logoH);
+  y += logoH + CRTA_MT;
+
+  ctx.fillStyle = '#E3000F';
+  ctx.fillRect(X, y, 96, CRTA_H);
+  y += CRTA_H + RIJEC_MT;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '400 34px Arial, Helvetica, sans-serif';
+  ctx.textBaseline = 'alphabetic';
+
+  /* Osnovna linija se računa kao u CSS-u: pola vodilje + uspon fonta.
+     Bez toga tri riječi „plutaju" par piksela u odnosu na stari panel. */
+  const m = ctx.measureText('Hxg');
+  const asc = m.fontBoundingBoxAscent || 34 * 0.905;
+  const desc = m.fontBoundingBoxDescent || 34 * 0.212;
+  const osnovna = (LH - (asc + desc)) / 2 + asc;
+
+  panelRijeci().forEach((rijec, i) => {
+    if (rijec) panelTekstRazmaknut(ctx, rijec, X, y + LH * i + osnovna, 13);
+  });
+}
+
+/* ─────────────────────────── pregled ─────────────────────────── */
+
+function osvjeziPanelPregled() {
+  const c = $('panelCanvas');
+  if (!c) return;
+  if (c.width !== PANEL_W) { c.width = PANEL_W; c.height = PANEL_H; }
+  nacrtajPanel(c.getContext('2d'));
+  const dugme = $('panelSaveBtn');
+  /* Bez fotografije nema šta da se šalje — tvornički panel već stoji. */
+  if (dugme) dugme.disabled = panelSalje || !panelFoto;
+}
+
+function ucitajPanelLogo() {
+  const img = new Image();
+  img.onload = () => { panelLogo = img; osvjeziPanelPregled(); };
+  img.onerror = () => { panelLogo = null; osvjeziPanelPregled(); };
+  img.src = resolveHosted(PANEL_LOGO_FILE);
+}
+
+/* ─────────────────────────── slanje ─────────────────────────── */
+
+function panelStatus(kljuc, greska) {
+  const el = $('panelStatus');
+  if (!el) return;
+  el.textContent = kljuc ? tr(kljuc) : '';
+  el.className = 'panel-status' + (greska ? ' bad' : '');
+}
+
+async function sacuvajPanel() {
+  if (panelSalje || !panelFoto) return;
+  panelSalje = true;
+  osvjeziPanelPregled();
+  panelStatus('panelSaving', false);
+
+  try {
+    const c = document.createElement('canvas');
+    c.width = PANEL_W; c.height = PANEL_H;
+    nacrtajPanel(c.getContext('2d'));
+
+    const blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', 0.9));
+    if (!blob) throw new Error('canvas');
+
+    const fd = new FormData();
+    fd.append('slika', blob, 'panel.jpg');
+    const r = await fetch('/api/signatura/panel', { method: 'POST', body: fd });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.url) throw new Error(j.greska || 'upload');
+
+    /* ⚠️ APSOLUTNA adresa. Server vraća relativnu, a potpis živi u tuđem
+       mail programu gdje relativna putanja ne znači ništa. */
+    panelVlastiti = new URL(j.url, location.href).href;
+    try { localStorage.setItem('portmix.panel', j.url); } catch { /* privatni prozor */ }
+    panelStatus('panelSaved', false);
+    render();
+  } catch (e) {
+    panelStatus('panelFailed', true);
+  } finally {
+    panelSalje = false;
+    osvjeziPanelPregled();
+  }
+}
+
+function vratiTvornickiPanel() {
+  panelVlastiti = '';
+  panelFoto = null;
+  try { localStorage.removeItem('portmix.panel'); } catch { /* privatni prozor */ }
+  const f = $('panelFoto');
+  if (f) f.value = '';
+  [0, 1, 2].forEach((i) => { const el = $('rijec' + i); if (el) el.value = PANEL_ORIG_RIJECI[i]; });
+  panelStatus('', false);
+  osvjeziPanelPregled();
+  render();
+}
+
+/* ─────────────────────────── vezivanje ─────────────────────────── */
+
+function povezPanelUredjivac() {
+  const foto = $('panelFoto');
+  if (!foto) return;
+
+  foto.addEventListener('change', () => {
+    const f = foto.files && foto.files[0];
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { panelStatus('panelNotImage', true); foto.value = ''; return; }
+    if (f.size > PANEL_MAX_MB * 1024 * 1024) { panelStatus('panelTooBig', true); foto.value = ''; return; }
+
+    /* `createObjectURL` je isti izvor, pa canvas ostaje čist i `toBlob` radi. */
+    const url = URL.createObjectURL(f);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); panelFoto = img; panelStatus('', false); osvjeziPanelPregled(); };
+    img.onerror = () => { URL.revokeObjectURL(url); panelStatus('panelNotImage', true); };
+    img.src = url;
+  });
+
+  [0, 1, 2].forEach((i) => {
+    const el = $('rijec' + i);
+    if (el) el.addEventListener('input', osvjeziPanelPregled);
+  });
+
+  $('panelSaveBtn')?.addEventListener('click', sacuvajPanel);
+  $('panelResetBtn')?.addEventListener('click', vratiTvornickiPanel);
+
+  ucitajPanelLogo();
+  osvjeziPanelPregled();
+}
+
+
 function setSeg(segId, attr, value){
   [...$(segId).children].forEach(b => b.classList.toggle('active', b.dataset[attr] === value));
 }
@@ -667,6 +1067,21 @@ function applyBrand(next, {migrate=true} = {}){
     $('showTagline').checked = to.showTagline;
     opts.icons = to.icons;
     setSeg('iconSeg','icons',opts.icons);
+    /* Panel nosi PortMixovu fotografiju i logo — kod drugog brenda nema
+       smisla. `buildSignature` to ionako presretne, ali bi dugme ostalo
+       upaljeno i covjek bi mislio da gleda nesto sto ne vidi. */
+    if(to.key !== 'portmix' && opts.layout === 'panel'){
+      opts.layout = 'split';
+      panelOdlozen = true;          /* da se vrati kad se covjek vrati na PortMix */
+      setSeg('layoutSeg','layout','split');
+    }
+    /* Bez ovoga bi PortMix poslije skoka na Helvetique ostao na „logo lijevo"
+       iako je panel njegov podrazumijevani raspored. */
+    if(to.key === 'portmix' && panelOdlozen){
+      opts.layout = 'panel';
+      panelOdlozen = false;
+      setSeg('layoutSeg','layout','panel');
+    }
   }
   brand = next;
   document.documentElement.style.setProperty('--accent', to.ui);
@@ -687,7 +1102,7 @@ function applyLanguage(lang, {updateDefaults=true}={}){
     mobileTextBtn:'copyMobile', copyBtn:'copySignature', downloadBtn:'downloadHtml',
     editorEyebrow:'editor', signatureDetailsTitle:'signatureDetails', identityTitle:'identity',
     fullNameLabel:'fullName', jobTitleLabel:'jobTitle', companyLabel:'company',
-    contactTitle:'contact', phoneLabel:'phone', mobileLabel:'mobilePhone', emailLabel:'email',
+    contactTitle:'contact', phoneLabel:'phone', emailLabel:'email',
     websiteLabel:'website', addressLabel:'address', formatTitle:'format', sizeLabel:'size',
     layoutLabel:'layout', iconModeLabel:'iconMode', brandTitle:'brand', accentLabel:'accent',
     taglineLabel:'tagline', optionsTitle:'options', showCompanyTitle:'showCompany',
@@ -699,6 +1114,10 @@ function applyLanguage(lang, {updateDefaults=true}={}){
     guidanceNote:'guidance', sourceNote:'source', footerText:'footer'
   };
   Object.entries(map).forEach(([id,key]) => setText(id, tr(key)));
+  /* ⚠️ Ove labele NOSE HTML (<small>opcionalno</small>) — moraju kroz
+     `setHtml`. `mobileLabel` je bio u grupi koja se puni tekstom, pa se na
+     stranici vidjela sirova oznaka. */
+  setHtml('mobileLabel', tr('mobilePhone'));
   setHtml('mapUrlLabel', tr('mapLink'));
   setHtml('logoUrlLabel', tr('logoUrl'));
   setHtml('messageCopy', tr('message'));
@@ -706,9 +1125,16 @@ function applyLanguage(lang, {updateDefaults=true}={}){
   setHtml('bestPracticeNotice', tr('bestPractice'));
 
   [['sizeSeg',['sizeCompact','sizeStandard','sizeLarge']],
-   ['layoutSeg',['layoutSplit','layoutStacked']],
+   /* ⚠️ Broj natpisa MORA pratiti broj dugmadi. Nedostajao je 'layoutPanel',
+      pa je treće dugme na stranici stajalo prazno. */
+   ['layoutSeg',['layoutSplit','layoutStacked','layoutPanel']],
    ['iconSeg',['iconImages','iconLabels','iconNone']]]
    .forEach(([id,keys]) => keys.forEach((k,i) => $(id).children[i].textContent = tr(k)));
+
+  setText('panelLabel', tr('panelLabel'));
+  setText('panelHint', tr('panelHint'));
+  setText('panelSaveBtn', tr('panelSave'));
+  setText('panelResetBtn', tr('panelReset'));
 
   setText('htmlBtn', $('codePanel').classList.contains('open') ? tr('hideHtml') : tr('viewHtml'));
   setText('modeStatus', tr('previewNote'));
@@ -835,7 +1261,8 @@ $('resetBtn').addEventListener('click', () => {
   $('showCompany').checked = true;
   $('showLocation').checked = true;
   $('showTagline').checked = b.showTagline;
-  opts = {size:'compact', layout:'split', icons:b.icons};
+  opts = {size:'standard', layout: brand === 'portmix' ? 'panel' : 'split', icons:b.icons};
+  panelOdlozen = false;
   setSeg('sizeSeg','size',opts.size);
   setSeg('layoutSeg','layout',opts.layout);
   setSeg('iconSeg','icons',opts.icons);
@@ -847,6 +1274,7 @@ $('resetBtn').addEventListener('click', () => {
 let saved=null;
 try{ saved = localStorage.getItem('signatureStudioLanguage'); }catch(e){}
 const bl = (navigator.language||'').toLowerCase();
+povezPanelUredjivac();
 applyBrand('portmix', {migrate:false});
 applyLanguage(
   saved && I18N[saved] ? saved

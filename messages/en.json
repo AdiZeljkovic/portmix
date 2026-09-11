@@ -143,8 +143,8 @@
         "rolePm": "Project Manager",
         "roleInstall": "Installation Manager",
         "orgInstallers": "10 installers",
-        "roleClientCare": "Client Relations Manager",
-        "roleInterior": "Interior Architect"
+        "roleInterior": "Interior Architect",
+        "roleInteriorJr": "Junior Interior Architect"
     },
     "services": {
         "kicker": "Our services",

@@ -143,8 +143,8 @@
         "rolePm": "Projektleiter",
         "roleInstall": "Montageleiter",
         "orgInstallers": "10 Monteure",
-        "roleClientCare": "Kundenbetreuerin",
-        "roleInterior": "Innenarchitektin"
+        "roleInterior": "Innenarchitektin",
+        "roleInteriorJr": "Junior-Innenarchitektin"
     },
     "services": {
         "kicker": "Unsere Leistungen",

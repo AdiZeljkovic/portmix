@@ -30,8 +30,8 @@ export type OrgPerson = {
         | 'roleFinance'
         | 'rolePm'
         | 'roleInstall'
-        | 'roleClientCare'
-        | 'roleInterior';
+        | 'roleInterior'
+        | 'roleInteriorJr';
     badgeKey?: 'orgInstallers';
 };
 
@@ -63,7 +63,7 @@ export const ORG: { lead: OrgPerson; branches: OrgBranch[] } = {
             department: {
                 name: 'Studio PortMix',
                 members: [
-                    { name: 'Ensara', roleKey: 'roleClientCare' },
+                    { name: 'Ensara', roleKey: 'roleInteriorJr' },
                     { name: 'Elyna', roleKey: 'roleInterior' }
                 ]
             }

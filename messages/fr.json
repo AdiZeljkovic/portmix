@@ -143,8 +143,8 @@
         "rolePm": "Chef de projet",
         "roleInstall": "Responsable de pose",
         "orgInstallers": "10 poseurs",
-        "roleClientCare": "Chargée de clientèle",
-        "roleInterior": "Architecte d'intérieur"
+        "roleInterior": "Architecte d'intérieur",
+        "roleInteriorJr": "Architecte d'intérieur junior"
     },
     "services": {
         "kicker": "Nos services",

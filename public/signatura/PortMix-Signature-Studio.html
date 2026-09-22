@@ -392,7 +392,14 @@ const BRANDS = {
     logoAsset:'logo', logoFile:'portmix-signature-logo.png', logoScale:1,
     /* Brend koji ima `panel` dobija i raspored „panel" i uređivač uz njega.
        Helvetique ga nema — njihova fotografija i logo ne postoje. */
-    panel:{ file:'portmix-signature-panel.jpg', logoFile:'logo-bijeli.png' },
+    /* Boje panela su OSOBINA BRENDA, ne tvrdo upisane u crtanje. PortMix
+       zadržava tačno ono što je oduvijek imao: tamni veo, bijeli znak i
+       riječi, crvena crtica i dijagonala. */
+    panel:{
+      file:'portmix-signature-panel.jpg', logoFile:'logo-bijeli.png',
+      veo:['rgba(8,8,10,.88)','rgba(8,8,10,.74)','rgba(8,8,10,.38)','rgba(8,8,10,.12)'],
+      prazno:'#1a1a1e', rijeci:'#ffffff', crtica:'#E3000F', dijagonala:'#E3000F'
+    },
     /* dijeli prevedeni podrazumijevani naslov i slogan */
     tekstPortMix:true,
     icons:'images',
@@ -421,7 +428,16 @@ const BRANDS = {
   studio: {
     key:'studio', ui:'#C92A2F',
     logoAsset:'logoStudio', logoFile:'studio-signature-logo.png', logoScale:1.05,
-    panel:{ file:'studio-signature-panel.jpg', logoFile:'logo-bijeli-studio.png' },
+    /* 🚨 Studio ide na SVIJETLU fotografiju: znak je crven sa crnim
+       „STUDIO", pa tamni veo ovdje ne dolazi u obzir — pod njim se ni crno
+       ni crveno ne bi pročitalo. Veo je zato topli, skoro bijeli, istog
+       nagiba i istog pada kao PortMixov, samo obrnut. Riječi prate crnu iz
+       znaka (#332520), a dijagonala je bež po Adijevom traženju. */
+    panel:{
+      file:'studio-signature-panel.jpg', logoFile:'logo-studio.png',
+      veo:['rgba(250,246,238,.92)','rgba(250,246,238,.80)','rgba(250,246,238,.44)','rgba(250,246,238,.16)'],
+      prazno:'#efe9df', rijeci:'#332520', crtica:'#DE0510', dijagonala:'#C8B295'
+    },
     tekstPortMix:true,
     icons:'images',
     theme:{
@@ -932,6 +948,9 @@ function panelTekstRazmaknut(ctx, tekst, x, y, razmak) {
 
 function nacrtajPanel(ctx) {
   const W = PANEL_W, H = PANEL_H;
+  /* Boje ovog brenda; Helvetique nema panel pa se uzima PortMixov skup da
+     funkcija nikad ne padne ako je neko ipak pozove. */
+  const st = panelBrenda() || BRANDS.portmix.panel;
 
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = '#ffffff';
@@ -943,7 +962,7 @@ function nacrtajPanel(ctx) {
     const dw = dh * (panelFoto.naturalWidth / panelFoto.naturalHeight);
     ctx.drawImage(panelFoto, (W - dw) * 0.58, (H - dh) * 0.55, dw, dh);
   } else {
-    ctx.fillStyle = '#1a1a1e';
+    ctx.fillStyle = st.prazno;
     ctx.fillRect(0, 0, W, H);
   }
 
@@ -957,17 +976,17 @@ function nacrtajPanel(ctx) {
     W / 2 - (dx * L) / 2, H / 2 - (dy * L) / 2,
     W / 2 + (dx * L) / 2, H / 2 + (dy * L) / 2
   );
-  g.addColorStop(0, 'rgba(8,8,10,.88)');
-  g.addColorStop(0.4, 'rgba(8,8,10,.74)');
-  g.addColorStop(0.7, 'rgba(8,8,10,.38)');
-  g.addColorStop(1, 'rgba(8,8,10,.12)');
+  g.addColorStop(0,   st.veo[0]);
+  g.addColorStop(0.4, st.veo[1]);
+  g.addColorStop(0.7, st.veo[2]);
+  g.addColorStop(1,   st.veo[3]);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 
   /* 3 ── bijeli klin (desna ćelija potpisa se nastavlja bijelom) */
   panelPoligon(ctx, [[662, 0], [800, 0], [800, 908], [790, 908]], '#ffffff');
-  /* 4 ── crvena dijagonala */
-  panelPoligon(ctx, [[648, 0], [668, 0], [796, 908], [776, 908]], '#E3000F');
+  /* 4 ── dijagonala (PortMix crvena, Studio bež) */
+  panelPoligon(ctx, [[648, 0], [668, 0], [796, 908], [776, 908]], st.dijagonala);
 
   /* 5 ── sadržaj: lijevo 58 px, uspravno centriran */
   const X = 58;
@@ -982,11 +1001,11 @@ function nacrtajPanel(ctx) {
   if (panelLogo && panelLogo.naturalWidth) ctx.drawImage(panelLogo, X, y, LOGO_W, logoH);
   y += logoH + CRTA_MT;
 
-  ctx.fillStyle = '#E3000F';
+  ctx.fillStyle = st.crtica;
   ctx.fillRect(X, y, 96, CRTA_H);
   y += CRTA_H + RIJEC_MT;
 
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = st.rijeci;
   ctx.font = '400 34px Arial, Helvetica, sans-serif';
   ctx.textBaseline = 'alphabetic';
 

@@ -268,9 +268,9 @@
             <p class="panel-hint" id="panelHint"></p>
             <input type="file" id="panelFoto" accept="image/*">
             <div class="panel-rijeci">
-              <input id="rijec0" maxlength="14" value="DESIGN" aria-label="1">
-              <input id="rijec1" maxlength="14" value="PLAN" aria-label="2">
-              <input id="rijec2" maxlength="14" value="REALISE" aria-label="3">
+              <input id="rijec0" maxlength="14" placeholder="DESIGN" aria-label="1">
+              <input id="rijec1" maxlength="14" placeholder="PLAN" aria-label="2">
+              <input id="rijec2" maxlength="14" placeholder="REALISE" aria-label="3">
             </div>
             <canvas id="panelCanvas" width="800" height="908"></canvas>
             <div class="panel-akcije">
@@ -995,7 +995,16 @@ function nacrtajPanel(ctx) {
     ? LOGO_W * (panelLogo.naturalHeight / panelLogo.naturalWidth)
     : 0;
 
-  const ukupno = logoH + CRTA_MT + CRTA_H + RIJEC_MT + LH * 3;
+  /* 🚨 Visina se računa prema onome što se ZAISTA crta. Dok su tri riječi
+     bile obavezne, `LH * 3` je uvijek ulazilo u račun; sada su podrazumijevano
+     prazne, pa bi fiksna rezervacija ostavila prazan pojas ispod crtice i
+     gurnula znak uvis. Broji se do ZADNJE popunjene riječi, da prazno polje
+     između dvije ispisane ne poremeti razmak. */
+  const rijeci = panelRijeci();
+  const redova = rijeci.reduce((n, r, i) => (r ? i + 1 : n), 0);
+  const visinaRijeci = redova ? RIJEC_MT + LH * redova : 0;
+
+  const ukupno = logoH + CRTA_MT + CRTA_H + visinaRijeci;
   let y = (H - ukupno) / 2;
 
   if (panelLogo && panelLogo.naturalWidth) ctx.drawImage(panelLogo, X, y, LOGO_W, logoH);
@@ -1016,7 +1025,7 @@ function nacrtajPanel(ctx) {
   const desc = m.fontBoundingBoxDescent || 34 * 0.212;
   const osnovna = (LH - (asc + desc)) / 2 + asc;
 
-  panelRijeci().forEach((rijec, i) => {
+  rijeci.forEach((rijec, i) => {
     if (rijec) panelTekstRazmaknut(ctx, rijec, X, y + LH * i + osnovna, 13);
   });
 }
@@ -1103,7 +1112,10 @@ function vratiTvornickiPanel() {
   try { localStorage.removeItem(panelKljuc(brand)); } catch { /* privatni prozor */ }
   const f = $('panelFoto');
   if (f) f.value = '';
-  [0, 1, 2].forEach((i) => { const el = $('rijec' + i); if (el) el.value = PANEL_ORIG_RIJECI[i]; });
+  /* ⚠️ Tvorničko stanje je BEZ riječi (29.9.2026., Adijev zahtjev: klijentu
+     smetaju iako ih smije mijenjati). Stare riječi stoje kao placeholder,
+     pa se vidi šta se tu može upisati. */
+  [0, 1, 2].forEach((i) => { const el = $('rijec' + i); if (el) el.value = ''; });
   panelStatus('', false);
   osvjeziPanelPregled();
   render();
